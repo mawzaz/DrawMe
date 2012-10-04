@@ -1,0 +1,20 @@
+#chat-main{
+
+}
+canvas{
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 1px 1px 1px black;
+  background-image: url(./images/background_paper_tile.jpeg);
+  width: 720px;
+  height: 512px;
+  position: absolute;
+}
+.chat-msg{
+
+}
+
+body{
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px;
+}
+
