@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="http://localhost:8000/faye.js"></script>
+<script type="text/javascript" src="./app.js"></script>
+<script type="text/javascript" src="./page.js"></script>
+</head>
+<body>
+<canvas id="canvas" height=720 width=500 style="border:1px black solid"></canvas>
+<script type="text/javascript">
+	var scheme = window.location.protocol,
+        host = location.hostname,
+        port = location.port,
+        path = '/faye';
+   bayeux = new Faye.Client(scheme + '//' + host + (port ? ':' + port : '') + path);
+	bayeux.connect();
+	app = new app();
+	app.init();
+</script>
+</body>
+</html>
