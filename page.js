@@ -1,4 +1,4 @@
-function page()
+function page(color)
 {
 	var self = this;
 	this.canvas = document.getElementById("canvas");
@@ -7,7 +7,10 @@ function page()
 	this.canvas.onmousedown = function(ev){self.onMouseClick(ev);}
 	
 	this.context = this.canvas.getContext('2d');
+	
+
 	this.positions = new Array();
+	this.color = color;
 }
 
 page.prototype =
@@ -16,7 +19,8 @@ page.prototype =
 	{
 		var self = this;
 		this.positions.push([ev.layerX,ev.layerY]);
-		this.context.beginPath();		this.context.moveTo(ev.layerX, ev.layerY);
+		this.context.beginPath();
+		this.context.moveTo(ev.layerX, ev.layerY);
 		
 		this.canvas.onmousemove = function(ev){self.onMouseMove(ev);}
 		this.canvas.onmouseup = function(ev){self.onMouseUp(ev);}
@@ -25,10 +29,14 @@ page.prototype =
 	
 	onMouseMove:function(ev)
 	{
+		this.context.strokeStyle = this.color;
+		
+		this.context.save();
 		this.positions.push([ev.layerX,ev.layerY]);
 		this.context.lineTo(ev.layerX, ev.layerY);
 				
 		this.context.stroke();
+		this.context.restore();
 	},
 	
 	onMouseUp:function(ev)
