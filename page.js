@@ -1,7 +1,7 @@
 function page(color)
 {
 	var self = this;
-	this.canvas = document.getElementById("canvas");
+	this.canvas = document.getElementById("proxycanvas");
 	
 	
 	this.canvas.onmousedown = function(ev){self.onMouseClick(ev);}
@@ -10,7 +10,6 @@ function page(color)
 	
 
 	this.positions = new Array();
-	this.color = color;
 }
 
 page.prototype =
@@ -29,14 +28,14 @@ page.prototype =
 	
 	onMouseMove:function(ev)
 	{
-		this.context.strokeStyle = this.color;
+		this.context.strokeStyle = UM.me.color;
 		
-		this.context.save();
 		this.positions.push([ev.layerX,ev.layerY]);
+
+		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 		this.context.lineTo(ev.layerX, ev.layerY);
 				
 		this.context.stroke();
-		this.context.restore();
 	},
 	
 	onMouseUp:function(ev)
@@ -44,9 +43,21 @@ page.prototype =
 		this.canvas.onmousemove = null;
 		this.canvas.onmouseup = null;
 		
+		var stroke = {points:this.positions,color:UM.me.color};
 		//send to cloud
-		bayeux.publish("/test",{points:JSON.stringify(this.positions)});		
+		Backend.publish({type:'stroke',stroke:stroke});
+
+		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+		App.addStroke(stroke);
 		
 		this.positions = new Array();
+	},
+
+	disable:function(){
+		$(this.canvas).hide();
+	},
+
+	enable:function(){
+		$(this.canvas).show();
 	}
 }

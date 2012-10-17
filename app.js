@@ -1,13 +1,67 @@
 function app()
 {
-	this.players = {};
+	this._init();
+	UM = new UserManager();
+	Backend = new Backend(1);
+	Page = new page();
+
 }
 app.prototype =
 {
-	init:function()
+	newChatMsg : function(msg){
+		var div=document.createElement('div');
+		div.className='chat-msg';
+		if(msg.user === UM.me.guid)
+			msg.value='*'+msg.value
+		$(div).html(msg.value);
+		$(div).css({
+			color:msg.color
+		});
+
+		$(this._chat).append(div);
+	},
+
+	addStroke : function(stroke){
+    var points = stroke.points;
+    
+    var context = this._context;
+
+    context.strokeStyle = stroke.color;
+    
+    context.beginPath();
+    context.moveTo(points[0][0],points[0][1]);
+    for(var i=1;i<points.length;i++)
+    {
+      context.lineTo(points[i][0],points[i][1]);
+    }
+    context.stroke();
+	},
+
+	addPlayers : function(players){
+		for(var i in players){
+			this.addPlayer(players[i]);
+		}
+	},
+
+	addPlayer : function(player){
+		if(UM.me.guid === player.guid)
+			player.name = '*'+player.name;
+		var newplayer = new Player(player);
+		
+		UM.add(newplayer);
+
+		this._players.appendChild(newplayer.ui);
+	},
+
+	removePlayer : function(guid){
+		var player = UM.get(guid);
+		player.leave();
+
+		UM.remove(player);
+	},
+
+	_init:function()
 	{
-		//TODO:Make a user manager
-		var me = new Player();
 
 		var self = this;
 
@@ -22,11 +76,20 @@ app.prototype =
 		canvas.height = $(document.body).height()-5;
 		canvas.width = 720;
 
+		var proxycanvas = document.createElement("canvas");
+		proxycanvas.id = 'proxycanvas';
+		$(proxycanvas).css('background-color','transparent');
+		proxycanvas.height = canvas.height;
+		proxycanvas.width = canvas.width;
+
+		this._context = canvas.getContext('2d');
+
 		
 		var lobby = document.createElement('div');
 		lobby.id='lobby';
 
 		document.body.appendChild(canvas);
+		document.body.appendChild(proxycanvas);
 		document.body.appendChild(lobby);
 
 		//Players
@@ -49,13 +112,7 @@ app.prototype =
 		playersmainctn.id = 'players-main-ctn';
 		playersctn.appendChild(playersmainctn);
 
-		var addPlayer = function(player){
-			if(me.guid === player.guid)
-				player.name = '*'+player.name;
-			var newplayer = new Player(player);
-			self.players[player.guid]=newplayer;
-			playersmainctn.appendChild(newplayer.ui);
-		}
+		this._players = playersmainctn;
 
 		//Chat
 		var chatdiv = document.createElement('div');
@@ -68,6 +125,8 @@ app.prototype =
 		var chatwrapper = document.createElement('div');
 		chatwrapper.id = "chat-wrapper";
 		chatdiv.appendChild(chatwrapper);
+
+		this._chat = chatwrapper;
 
 		var chatlabel = document.createElement('div');
 		$(chatlabel).html('Chalkboard');
@@ -109,62 +168,13 @@ app.prototype =
 			switch(event.which || event.keyCode){
 				case 13:
 					event.preventDefault();
-					bayeux.publish("/test",{chat:replybox.value, color:me.color, user:me.guid});
+					Backend.publish({type:'chat',chat:{value:replybox.value, color:UM.me.color, user:UM.me.guid}},
+						function(data){self.newChatMsg(data.chat)});
 					replybox.value = "";
 					$(replybox).blur();
 					$(replybox).focus();
 				break;
 			}
 		});
-
-		var newChatMsg = function(msg){
-			var div=document.createElement('div');
-			div.className='chat-msg';
-			if(msg.user === me.guid)
-				msg.chat='*'+msg.chat
-			$(div).html(msg.chat);
-			$(div).css({
-				color:msg.color
-			});
-
-			$(chatwrapper).append(div);
-		}
-
-		var subscription = bayeux.subscribe("/test",function(message){
-
-			if(message.chat){
-				newChatMsg(message);
-				return;
-			}
-
-			if(message.user){
-				if(!self.players[message.user.guid]){
-					addPlayer(message.user);
-					bayeux.publish("/test",{user:me.flatten()});
-				}
-				return;
-			}
-
-			var context = canvas.getContext('2d');
-			var points = JSON.parse(message.points);
-			
-			context.beginPath();
-			context.moveTo(points[0][0],points[0][1]);
-			for(var i=1;i<points.length;i++)
-			{
-				context.lineTo(points[i][0],points[i][1]);
-			}
-			context.stroke();
-		});
-
-		subscription.callback(function() {
-			alert('Welcome to DrawMe :)');
-			bayeux.publish("/test",{user:me.flatten()});
-		});
-		subscription.errback(function(error) {
-			alert('Something went wrong, refresh your browser.');
-		});
-		
-		new page(me.color);
 	}
 }

@@ -49,6 +49,10 @@ Player.prototype = {
         );
   },
 
+  leave : function(){
+    $(this.ui).remove();
+  },
+
   flatten : function(){
     return {name:this.name.replace('*',''), color:this.color, guid:this.guid};
   }

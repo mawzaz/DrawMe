@@ -5,21 +5,17 @@
 <link rel='stylesheet' href="./style.css" type="text/css" media='screen'></link>
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Finger Paint">
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="./faye.js"></script>
+<script src="./socket.io/socket.io.js"></script>
 <script type="text/javascript" src="./app.js"></script>
 <script type="text/javascript" src="./page.js"></script>
 <script type="text/javascript" src="./Player.js"></script>
+<script type="text/javascript" src="./backend.js"></script>
+<script type="text/javascript" src="./usermanager.js"></script>
+
 </head>
 <body>
 <script type="text/javascript">
-	var scheme = window.location.protocol,
-        host = location.hostname,
-        port = location.port,
-        path = '/faye';
-   bayeux = new Faye.Client(scheme + '//' + host + (port ? ':' + port : '') + path);
-	bayeux.connect();
-	app = new app();
-	app.init();
+	App = new app();
 </script>
 </body>
 </html>
