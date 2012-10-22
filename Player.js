@@ -1,8 +1,4 @@
-function Player(params){
-  this._firstNames = new Array("Runny", "Buttercup", "Dinky", "Stinky", "Crusty", "Greasy", "Gidget", "Cheesypoof", "Lumpy", "Wacky", "Tiny", "Flunky", "Fluffy", "Zippy", "Doofus", "Gobsmacked", "Slimy", "Grimy", "Salamander", "Oily", "Burrito", "Bumpy", "Loopy", "Snotty", "Irving", "Egbert");
-  this._lastNames = new Array("Snicker", "Buffalo", "Gross", "Bubble", "Sheep", "Corset", "Toilet", "Lizard", "Waffle", "Kumquat", "Burger", "Chimp", "Liver", "Gorilla", "Rhino", "Emu", "Pizza", "Toad", "Gerbil", "Pickle", "Tofu", "Chicken", "Potato", "Hamster", "Lemur", "Vermin");
-  this._lastNames2 = new Array("face", "dip", "nose", "brain", "head", "breath", "pants", "shorts", "lips", "mouth", "muffin", "butt", "bottom", "elbow", "honker", "toes", "buns", "spew", "kisser", "fanny", "squirt", "chunks", "brains", "wit", "juice", "shower");
-  
+function Player(params){  
   params = params || {};
   this.name = params.name || this._generateName();
   this.color = params.color || this._generateColor();
@@ -13,7 +9,7 @@ function Player(params){
   $(div).html(this.name);
   $(div).css({
     color:this.color
-  })
+  });
 
   this.ui = div;
 
@@ -21,7 +17,7 @@ function Player(params){
 
 Player.prototype = {
   _generateName : function(){
-    return this._firstNames[Math.floor(Math.random()*this._firstNames.length)]+' '+this._lastNames[Math.floor(Math.random()*this._lastNames.length)];+this._lastNames2[Math.floor(Math.random()*this._lastNames2.length)];
+    return firstNames[Math.floor(Math.random()*firstNames.length)]+' '+lastNames[Math.floor(Math.random()*lastNames.length)];+lastNames2[Math.floor(Math.random()*lastNames2.length)];
   },
 
   _generateColor : function(){

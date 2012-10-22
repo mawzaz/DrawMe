@@ -6,8 +6,12 @@ function UserManager(){
 
 UserManager.prototype = {
   add : function(player){
-    if(!this.players[player.guid])
+    if(!this.players[player.guid]){
       this.players[player.guid] = player;
+      return true;
+    }
+    else
+      return false;
   },
   remove : function(guid){
     delete this.players[guid];

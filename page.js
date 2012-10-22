@@ -7,9 +7,11 @@ function page(color)
 	this.canvas.onmousedown = function(ev){self.onMouseClick(ev);}
 	
 	this.context = this.canvas.getContext('2d');
+	this.color = 'black';
 	
 
 	this.positions = new Array();
+	this.disable();
 }
 
 page.prototype =
@@ -28,7 +30,7 @@ page.prototype =
 	
 	onMouseMove:function(ev)
 	{
-		this.context.strokeStyle = UM.me.color;
+		this.context.strokeStyle = this.color;
 		
 		this.positions.push([ev.layerX,ev.layerY]);
 
@@ -47,10 +49,13 @@ page.prototype =
 		//send to cloud
 		Backend.publish({type:'stroke',stroke:stroke});
 
-		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
-		App.addStroke(stroke);
+		this.clear();
 		
 		this.positions = new Array();
+	},
+
+	clear : function(){
+		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 	},
 
 	disable:function(){

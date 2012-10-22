@@ -23,9 +23,29 @@ Backend.prototype = {
         App.removePlayer(message.player);
         break;
       case 'stroke':
-        App.addStroke(message.stroke)
+        App.addStroke(message.stroke);
         break;
-    }
+      case 'clock':
+        console.log('Time left: '+message.round.time);
+        CoreM.run('Countdown',message.round);
+        break;
+      case 'round_start':
+        console.log('Begining round ' + message.round.nb);
+        console.log(message.round);
+        CoreM.run('Round Start',message.round);
+        break;
+      case 'round_end':
+        console.log('Ending round ' + message.round.nb);
+        console.log(message.round);
+        CoreM.run('Round End',message.round);
+        break;
+      case 'results':
+        CoreM.run('Results',message);
+        break;
+      case 'idle':
+        App.Idle();
+        console.log('waiting for 1 more player...');
+    } 
   },
 
   publish : function(message,cb){
@@ -36,5 +56,10 @@ Backend.prototype = {
     alert('Welcome to DrawMe! :)');
     //add users and strokes that are in progress
     App.addPlayers(data.users);
+
+    if(!data.round.nb){
+      console.log('waiting for 1 more player...');
+      App.idle();
+    }
   }
 }
