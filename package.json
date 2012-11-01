@@ -1,6 +1,10 @@
 {
+  "name": "DrawMe",
+  "version": "0.0.1",
   "dependencies": {
     "socket.io" : "*",
-    "express" : "*"
+    "express" : "*",
+    "redis" : "*",
+    "node-guid" : "git://github.com/Reregistered/node-guid.git"
   }
 }

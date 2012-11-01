@@ -63,11 +63,13 @@ RoundManager.prototype = {
     
     if(this._synchronize(round)){
       $(this._round_nb).removeClass('round-over');
-      $(this._round_nb).addClass('round-start');
+      $(this._round_timer).removeClass('round-over');
 
       this.countdown(round);
       $(this._round_nb).html(round.nb);
 
+      this._notify();
+      
       if(round.drawer === UM.me.guid){
         this._generateUI(round.word);
         Page.enable();
@@ -78,8 +80,8 @@ RoundManager.prototype = {
   end : function(round){
     this._time = round.time;
     if(this._synchronize(round)){
-      $(this._round_nb).removeClass('round-start');
       $(this._round_nb).addClass('round-over');
+      $(this._round_timer).addClass('round-over');
       this._removeDrawerUi();
       Page.disable();
     }
@@ -89,6 +91,12 @@ RoundManager.prototype = {
     this._time = round.time;
     if(this._synchronize(round)){
       $(this._round_timer).html(round.time);
+
+      if(round.time < 16){
+        $(this._round_timer).addClass('round-over');
+      }else{
+        $(this._round_timer).removeClass('round-over');
+      }
     }
   },
 
@@ -101,6 +109,24 @@ RoundManager.prototype = {
     //   return false;
     // }
     return true;
+  },
+
+  _notify : function(){
+    var div = document.createElement('div');
+    div.className = 'drawer-notification';
+    document.body.appendChild(div);
+
+    var msg = document.createElement('div');
+    msg.id = 'idle-ctn';
+    $(msg).height(150);
+
+    $(msg).html('D R A W!');
+
+    div.appendChild(msg);
+
+    $(div).fadeOut(1000,function(){
+      $(div).remove();
+    });
   },
 
   _generateUI : function(word){
@@ -160,7 +186,13 @@ RoundManager.prototype = {
   },
 
   _removeDrawerUi :function(){
-    $(this._drawerui.wordctn).remove();
-    $(this._drawerui.colorpalette).remove();
+    if(this._drawerui){
+      $(this._drawerui.wordctn).remove();
+      $(this._drawerui.colorpalette).remove();
+    }
+  },
+
+  getDrawer : function(){
+    return this._drawer;
   }
 }

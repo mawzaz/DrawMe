@@ -44,8 +44,10 @@ page.prototype =
 	{
 		this.canvas.onmousemove = null;
 		this.canvas.onmouseup = null;
+
+		App.addStroke({points:this.positions});
 		
-		var stroke = {points:this.positions,color:UM.me.color};
+		var stroke = {points:this.positions,color:this.color,user:UM.me.guid};
 		//send to cloud
 		Backend.publish({type:'stroke',stroke:stroke});
 

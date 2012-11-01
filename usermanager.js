@@ -19,5 +19,14 @@ UserManager.prototype = {
 
   get : function(guid){
     return this.players[guid];
+  },
+
+  length : function(){
+    var count = 0;
+    for(var i in this.players){
+      count++;
+    }
+
+    return count;
   }
 }

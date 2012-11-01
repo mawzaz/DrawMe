@@ -6,8 +6,6 @@ function Backend(room){
     self._socket.emit('room_connect',{room:room,player:UM.me.flatten()},function(data){self.room_connect(data)});
     self._socket.on('on_room_update',function(data){self.processMessage(data)});
   });
-
-
 }
 
 Backend.prototype = {
@@ -17,7 +15,7 @@ Backend.prototype = {
         App.newChatMsg(message.chat);
         break;
       case 'user_add':
-        App.addPlayer(message.player);
+        App.addPlayer(message.player,true);
         break;
       case 'user_remove':
         App.removePlayer(message.player);
@@ -28,6 +26,9 @@ Backend.prototype = {
       case 'clock':
         console.log('Time left: '+message.round.time);
         CoreM.run('Countdown',message.round);
+        break;
+      case 'pre_round_start':
+        CoreM.run('Pre Round Start',message.round)
         break;
       case 'round_start':
         console.log('Begining round ' + message.round.nb);
@@ -43,7 +44,7 @@ Backend.prototype = {
         CoreM.run('Results',message);
         break;
       case 'idle':
-        App.Idle();
+        App.idle();
         console.log('waiting for 1 more player...');
     } 
   },
@@ -56,10 +57,23 @@ Backend.prototype = {
     alert('Welcome to DrawMe! :)');
     //add users and strokes that are in progress
     App.addPlayers(data.users);
+    App.pickDrawer(data.round);
 
-    if(!data.round.nb){
+    if(!data.round.nb && UM.length() < 2){
       console.log('waiting for 1 more player...');
       App.idle();
     }
+
+    if(data.round.drawer !== UM.me.guid){
+      App.showChat();
+    }
+
+    if(data.round.drawing){
+      App.deferredWork.push(function(){App.addStrokes(data.round.drawing)});
+    }
+
+    App.busy = false;
+    App.runDeferredWork();
+    
   }
 }

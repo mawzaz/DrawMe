@@ -1,19 +1,20 @@
 var io = require('socket.io'),
     express = require('express'),
     app = express(),
-    server = require('http').createServer(app);
+    server = require('http').createServer(app)
+    redis_db = require('./redis-db.js');
+    node_guid = require('node-guid');
 
 app.use(express.static(__dirname + '/'));
 app.use('/images', express.static(__dirname + '/'));
 
-io = io.listen(server);
+io = io.listen(server,{ log: false });
 server.listen(8000);
 
 var rooms = {};
 
 var MAX_TIME = 90000; //1 min 30 sec
 // var MAX_TIME = 5000;
-
 
 var WORDS = ['dog','cat','ball','couch','horse','house','money','human','bird'];
 
@@ -23,7 +24,7 @@ io.sockets.on('connection',function(socket){
     var player = null;
 
     socket.on('room_connect',function(data,cb){
-        console.log('[SOMEONE IS JOINING ROOM #'+data.room+']');
+        console.log('['+data.player.name+' IS JOINING ROOM #'+data.room+']');
 
         player = data.player;
         room_nb = data.room;
@@ -34,11 +35,11 @@ io.sockets.on('connection',function(socket){
         
         if(!room){
             room = rooms[data.room] = {
+                guid:node_guid.new(),
                 users:{},
                 users_count:0,
-                current_word:'',
                 drawer_queue:[],
-                round:{timer:0,nb:0,clock:null,drawer:null}
+                round:{timer:0,nb:0,clock:null,drawer:null,word:null}
             }
         }else if(rooms[data.room].users_count === 1){
           startRound(room);
@@ -52,7 +53,10 @@ io.sockets.on('connection',function(socket){
 
         //let everyone know about it
         broadcast({type:'user_add',player:player});
-        cb({users:room.users,round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer}});
+
+        redis_db.getCurrentDrawing(room,function(err,strokes){
+            cb({users:room.users,round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, drawing:strokes}});
+        });
     });
 
     socket.on('room_update',function(data,cb){
@@ -61,6 +65,8 @@ io.sockets.on('connection',function(socket){
                 //process guess
                 processGuess(data);
                 break;
+            case 'stroke':
+                redis_db.put(rooms[room_nb],data.stroke);
             default:
                 broadcast(data);    
         }
@@ -73,6 +79,10 @@ io.sockets.on('connection',function(socket){
     });
 
     var leaveRoom = function(){
+        console.log('['+player.name+' IS LEAVING ROOM #'+room_nb+']');
+
+        broadcast({type:'user_remove',player:player.guid});
+        
         var room = rooms[room_nb];
 
         delete room.users[player.guid];
@@ -80,19 +90,24 @@ io.sockets.on('connection',function(socket){
 
         //remove user from drawer queue (if still present)
         for(var i in room.drawer_queue){
-            if(!room.drawer_queue[i])
-                break;
             if (room.drawer_queue[i].guid === player.guid)
-                room.drawer_queue[i] = null;
+                room.drawer_queue.splice(i,1);
         }
 
         if(room.users_count <= 0){
             delete rooms[room_nb];
-        }else if(room.users_count === 1){
+        }else if(room.users_count === 1 || room.round.drawer.guid === player.guid){
+            redis_db.flush(room,true);
+
             stopRound(room);
+
+            if(!room.drawer_queue.length){
+                for(var i in room.users){
+                    room.drawer_queue.push(room.users[i]);
+                }
+            }
         }
 
-        broadcast({type:'user_remove',player:player.guid});
         socket.leave(channel);
     }
 
@@ -101,33 +116,39 @@ io.sockets.on('connection',function(socket){
     }
 
     var startRound = function(room){
-        room.round.timer = MAX_TIME/1000;
         room.round.drawer = room.drawer_queue.shift();
-        room.round.word = WORDS[Math.floor(Math.random()*WORDS.length)];
+        broadcast({type:'pre_round_start', round:{drawer:room.round.drawer ? room.round.drawer.guid : null, nb:room.round.nb}});
 
-        broadcast({type:'round_start',round:{nb:++room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, word:room.round.word}});
+        room.round.delayTimeout = setTimeout(function(){
+            room.round.timer = MAX_TIME/1000;
+            room.round.word = WORDS[Math.floor(Math.random()*WORDS.length)];
 
-        room.round.clock = setInterval(function(){
-            if(room.round.timer < 0){
-                clearInterval(room.round.clock);
-                return;
-            }
-            try{
-                room.round.timer--;
-                if(room.round.timer < 1){
-                    room.round.time = 0;
+            broadcast({type:'round_start',round:{nb:++room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, word:room.round.word}});
+
+            room.round.clock = setInterval(function(){
+                if(room.round.timer < 0){
+                    clearInterval(room.round.clock);
+                    return;
+                }
+                try{
+                    room.round.timer--;
+                    if(room.round.timer < 1){
+                        room.round.time = 0;
+                        clearInterval(room.round.clock);
+                    }
+                    broadcast({type:'clock',round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer.guid}});
+                }catch(e){
                     clearInterval(room.round.clock);
                 }
-                broadcast({type:'clock',round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer.guid}});
-            }catch(e){
-                clearInterval(room.round.clock);
-            }
-        },1000); //decrease countdown
+            },1000); //decrease countdown
 
-        //reset timer when done
-        room.round.stop = setTimeout(function(){
-            stopRound(room);
-        },MAX_TIME)
+            //reset timer when done
+            room.round.stop = setTimeout(function(){
+                broadcast({type:'results', winner:null, word:room.round.word});
+                redis_db.flush(room);
+                stopRound(room);
+            },MAX_TIME)
+        },5000);
     }
 
     var stopRound = function(room){
@@ -136,6 +157,7 @@ io.sockets.on('connection',function(socket){
         //reset clock
         clearInterval(room.round.clock);
         clearTimeout(room.round.stop);
+        clearTimeout(room.round.delayTimeout);
 
         broadcast({type:'round_end',round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer.guid}});
 
@@ -154,13 +176,14 @@ io.sockets.on('connection',function(socket){
 
     var processGuess = function(msg){
         var room = rooms[room_nb];
+        broadcast(msg);
 
         if(msg.chat.value.toLowerCase() === room.round.word){
-            stopRound(room);
-            broadcast({type:'results', winner:msg.chat.user});
-        }
+            redis_db.flush(room);
 
-        broadcast(msg);
+            broadcast({type:'results', winner:msg.chat.user, word:room.round.word});
+            stopRound(room);
+        }
     }
 
 });

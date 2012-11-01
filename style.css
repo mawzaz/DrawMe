@@ -32,9 +32,12 @@ canvas{
   overflow-y: auto;
   text-shadow: 1px 1px black;
 }
+#chat-wrapper.stretch{
+  bottom: 11px;
+}
 .chat-msg{
   display: inline-block;
-  margin-left: 10px;
+  margin-left: 4px;
 }
 .chat-msg-user{
   display: inline-block;
@@ -191,6 +194,33 @@ body{
   opacity: 0.7;
 }
 
+
 #synchronize-ctn{
 
+}
+
+.current-drawer{
+  background-image: url(./images/glyphicons-halflings-white.png);
+  background-position: 0 -72px;
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  margin-left: 6px;
+  margin-bottom: -3px;
+}
+
+.notification{
+}
+
+.inline{
+  display: inline-block;
+}
+
+.drawer-notification{
+  z-index: 99;
+  font-size: 40px;
+}
+
+.round-over{
+  color: red
 }
