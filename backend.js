@@ -5,6 +5,7 @@ function Backend(room){
   this._socket.on('connect',function(){
     self._socket.emit('room_connect',{room:room,player:UM.me.flatten()},function(data){self.room_connect(data)});
     self._socket.on('on_room_update',function(data){self.processMessage(data)});
+    self._socket.on('drawing',function(data){App.processStroke(data)});
   });
 }
 
@@ -20,9 +21,9 @@ Backend.prototype = {
       case 'user_remove':
         App.removePlayer(message.player);
         break;
-      case 'stroke':
-        App.addStroke(message.stroke);
-        break;
+      // case 'stroke':
+      //   App.addStroke(message.stroke);
+      //   break;
       case 'clock':
         console.log('Time left: '+message.round.time);
         CoreM.run('Countdown',message.round);
@@ -51,6 +52,11 @@ Backend.prototype = {
 
   publish : function(message,cb){
     this._socket.emit('room_update',message,cb);
+  },
+
+  sendStroke : function(stroke){
+    if(stroke)
+      this._socket.emit('drawing',stroke);
   },
 
   room_connect : function(data){

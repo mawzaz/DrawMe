@@ -199,6 +199,11 @@ body{
 
 }
 
+.disable-chat{
+  cursor: default;
+  -webkit-user-select : none;
+}
+
 .current-drawer{
   background-image: url(./images/glyphicons-halflings-white.png);
   background-position: 0 -72px;

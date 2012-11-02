@@ -51,9 +51,26 @@ app.prototype =
 		this._focusChat();
 	},
 
+	processStroke : function(stroke){
+		switch(stroke.type){
+			case "begin":
+				Page.beginPath(stroke)
+				break;
+			case "point":
+				Page.drawPath(stroke);
+				break;
+			case "end":
+				Page.clear();
+				this.addStroke(stroke);
+				break;
+		}
+	},
+
 	addStrokes : function(strokes){
+		var stroke;
 		for(var i in strokes){
-			this.addStroke(JSON.parse(strokes[i]));
+			stroke = JSON.parse(strokes[i]);
+			this.processStroke(stroke);
 		}
 	},
 
@@ -67,6 +84,7 @@ app.prototype =
 
     // context.strokeStyle = stroke.color;
     
+    context.strokeStyle = stroke.color;
     context.beginPath();
     context.moveTo(points[0][0],points[0][1]);
     for(var i=1;i<points.length;i++)
@@ -285,13 +303,13 @@ app.prototype =
 		// }
 
 		Page.clear();
-		this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
+		// this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
 		// this._chat.appendChild(points);
 	},
 
 	preNewRound : function(round){
 		var self = this;
-		this.hideChat();
+		this.hideChat("Waiting for next round...");
 
 		if(this.busy){
 			this.deferredWork.push(function(){
@@ -300,8 +318,8 @@ app.prototype =
 			return;
 		}
 
-		this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
-		Page.clear();
+		// this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
+		Page.disable();
 
 		if(this._idle)
 			$(this._idle).remove();
@@ -342,14 +360,17 @@ app.prototype =
 		this._focusChat();
 	},
 
-	hideChat : function(){
-		$(this._replybox).parent().hide();
-		$(this._chat).addClass('stretch');
+	hideChat : function(msg){
+		this._replybox.disabled = true;
+		this._replybox.value = msg;
+		$(this._replybox).addClass('disable-chat');
 	},
 
 	showChat : function(){
-		$(this._replybox).parent().show();
-		$(this._chat).removeClass('stretch');
+		this._replybox.disabled = false;
+		this._replybox.value = "";
+		$(this._replybox).blur();
+		$(this._replybox).removeClass('disable-chat');
 	},
 
 	_focusChat : function(){
@@ -381,7 +402,7 @@ app.prototype =
 		// this._chat.appendChild(info);
 
 		if(round.drawer === UM.me.guid){
-			this.hideChat();
+			this.hideChat("Your turn to draw!");
 		}else{
 			this.showChat();
 		}
@@ -504,7 +525,7 @@ app.prototype =
 		replyboxctn.appendChild(replybox);
 
 		$(replybox).focus(function(){
-			if(replybox.value === defaultText)
+			if(replybox.value === defaultText && !replybox.disabled)
 				replybox.value= '';
 		});
 
@@ -533,7 +554,6 @@ app.prototype =
 			}
 		});
 
-		this.hideChat();
-
+		this.hideChat("Waiting for next round...");
 	}
 }

@@ -17,9 +17,41 @@ _.put = function(room,data,cb){
 
 _.getCurrentDrawing = function(room,cb){
   var key = 'room:drawing:'+room.guid;
+
+  var pageItr = 0;
+  var pageSize = 100;
+
+
   client.llen([key],function(err,length){
-    client.lrange([key,0,length-1],function(err,data){
-      cb(err,data)
+    var strokes=[];
+
+    var max = length;
+    var fetchPage = function (pItr,pSize){
+      var start = pageItr*pSize;
+      var end = (pageItr+1)*pSize -1;
+
+      client.lrange([key,start,end],function(err, data){
+        //append the strokes
+        for(var i in data){
+          if(JSON.parse(data[i]).type === 'end'){
+            strokes.push(data[i]);
+          }
+        }
+
+        if (pageItr*pSize + pSize >= max){
+          cb(null,strokes);
+        }else{
+          pageItr++;
+          process.nextTick(function(){
+              fetchPage((pItr+1),pageSize);
+          })
+        }
+      });
+    }
+
+    // now iterate over the list appending and joining as needed
+    process.nextTick(function(){
+        fetchPage(pageItr,pageSize);
     });
   });
 };

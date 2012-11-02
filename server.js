@@ -65,13 +65,16 @@ io.sockets.on('connection',function(socket){
                 //process guess
                 processGuess(data);
                 break;
-            case 'stroke':
-                redis_db.put(rooms[room_nb],data.stroke);
             default:
                 broadcast(data);    
         }
         if(cb)
             cb(data);
+    });
+
+    socket.on('drawing',function(data){
+        redis_db.put(rooms[room_nb],data);
+        socket.broadcast.to(channel).emit('drawing',data);
     });
 
     socket.on('disconnect',function(){
@@ -112,7 +115,7 @@ io.sockets.on('connection',function(socket){
     }
 
     var broadcast = function(data){
-        io.sockets.to(channel).emit('on_room_update',data)
+        io.sockets.to(channel).emit('on_room_update',data);
     }
 
     var startRound = function(room){

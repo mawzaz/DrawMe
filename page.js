@@ -3,12 +3,8 @@ function page(color)
 	var self = this;
 	this.canvas = document.getElementById("proxycanvas");
 	
-	
-	this.canvas.onmousedown = function(ev){self.onMouseClick(ev);}
-	
 	this.context = this.canvas.getContext('2d');
 	this.color = 'black';
-	
 
 	this.positions = new Array();
 	this.disable();
@@ -20,8 +16,10 @@ page.prototype =
 	{
 		var self = this;
 		this.positions.push([ev.layerX,ev.layerY]);
-		this.context.beginPath();
-		this.context.moveTo(ev.layerX, ev.layerY);
+
+		this.beginPath({point:[ev.layerX,ev.layerY],color:this.color});
+
+		Backend.sendStroke({type:"begin",point:[ev.layerX,ev.layerY],color:this.color});
 		
 		this.canvas.onmousemove = function(ev){self.onMouseMove(ev);}
 		this.canvas.onmouseup = function(ev){self.onMouseUp(ev);}
@@ -29,15 +27,12 @@ page.prototype =
 	},
 	
 	onMouseMove:function(ev)
-	{
-		this.context.strokeStyle = this.color;
-		
+	{		
 		this.positions.push([ev.layerX,ev.layerY]);
 
-		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
-		this.context.lineTo(ev.layerX, ev.layerY);
-				
-		this.context.stroke();
+		this.drawPath({point:[ev.layerX,ev.layerY]});
+
+		Backend.sendStroke({type:"point",point:[ev.layerX,ev.layerY],color:this.color});
 	},
 	
 	onMouseUp:function(ev)
@@ -45,15 +40,25 @@ page.prototype =
 		this.canvas.onmousemove = null;
 		this.canvas.onmouseup = null;
 
-		App.addStroke({points:this.positions});
-		
-		var stroke = {points:this.positions,color:this.color,user:UM.me.guid};
-		//send to cloud
-		Backend.publish({type:'stroke',stroke:stroke});
+		App.addStroke({points:this.positions, color:this.color});
+		Backend.sendStroke({type:"end",points:this.positions,color:this.color});
 
 		this.clear();
 		
 		this.positions = new Array();
+	},
+
+	beginPath : function(stroke){
+		this.context.strokeStyle = stroke.color;
+		this.context.beginPath();
+		this.context.moveTo(stroke.point[0], stroke.point[1]);
+	},
+
+	drawPath : function(stroke){
+		this.clear();
+		this.context.lineTo(stroke.point[0], stroke.point[1]);
+				
+		this.context.stroke();
 	},
 
 	clear : function(){
@@ -61,10 +66,11 @@ page.prototype =
 	},
 
 	disable:function(){
-		$(this.canvas).hide();
+		this.canvas.onmousedown = null;
 	},
 
 	enable:function(){
-		$(this.canvas).show();
+		var self = this;
+		this.canvas.onmousedown = function(ev){self.onMouseClick(ev);}
 	}
 }
