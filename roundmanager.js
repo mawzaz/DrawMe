@@ -68,7 +68,7 @@ RoundManager.prototype = {
       this.countdown(round);
       $(this._round_nb).html(round.nb);
 
-      this._notify();
+      this._notify(round);
       
       if(round.drawer === UM.me.guid){
         this._generateUI(round.word);
@@ -111,7 +111,7 @@ RoundManager.prototype = {
     return true;
   },
 
-  _notify : function(){
+  _notify : function(round){
     var div = document.createElement('div');
     div.className = 'drawer-notification';
     document.body.appendChild(div);
@@ -120,7 +120,11 @@ RoundManager.prototype = {
     msg.id = 'idle-ctn';
     $(msg).height(150);
 
-    $(msg).html('D R A W!');
+    if(round.drawer === UM.me.guid){
+      $(msg).html('D R A W !');
+    }else{
+      $(msg).html('G U E S S !');
+    }
 
     div.appendChild(msg);
 

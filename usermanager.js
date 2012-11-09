@@ -13,8 +13,9 @@ UserManager.prototype = {
     else
       return false;
   },
-  remove : function(guid){
-    delete this.players[guid];
+  remove : function(player){
+    if(player)
+      delete this.players[player.guid];
   },
 
   get : function(guid){

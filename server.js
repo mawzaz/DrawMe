@@ -120,13 +120,25 @@ io.sockets.on('connection',function(socket){
 
     var startRound = function(room){
         room.round.drawer = room.drawer_queue.shift();
-        broadcast({type:'pre_round_start', round:{drawer:room.round.drawer ? room.round.drawer.guid : null, nb:room.round.nb}});
 
-        room.round.delayTimeout = setTimeout(function(){
+        var round = {drawer:room.round.drawer ? room.round.drawer.guid : null, nb:++room.round.nb};
+        broadcast({type:'pre_round_start', round:round});
+
+        var countdown = 5;
+        room.round.delayInterval = setInterval(function(){
+            if(countdown > 0){
+                round.time = countdown;
+                broadcast({type:'pre_round_countdown', round:round})
+                countdown--;
+                return;
+            }
+
+            clearInterval(room.round.delayInterval);
+
             room.round.timer = MAX_TIME/1000;
             room.round.word = WORDS[Math.floor(Math.random()*WORDS.length)];
 
-            broadcast({type:'round_start',round:{nb:++room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, word:room.round.word}});
+            broadcast({type:'round_start',round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, word:room.round.word}});
 
             room.round.clock = setInterval(function(){
                 if(room.round.timer < 0){
@@ -151,7 +163,7 @@ io.sockets.on('connection',function(socket){
                 redis_db.flush(room);
                 stopRound(room);
             },MAX_TIME)
-        },5000);
+        },1000);
     }
 
     var stopRound = function(room){
@@ -160,7 +172,7 @@ io.sockets.on('connection',function(socket){
         //reset clock
         clearInterval(room.round.clock);
         clearTimeout(room.round.stop);
-        clearTimeout(room.round.delayTimeout);
+        clearTimeout(room.round.delayInterval);
 
         broadcast({type:'round_end',round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer.guid}});
 

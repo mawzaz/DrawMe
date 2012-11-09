@@ -21,9 +21,9 @@ Backend.prototype = {
       case 'user_remove':
         App.removePlayer(message.player);
         break;
-      // case 'stroke':
-      //   App.addStroke(message.stroke);
-      //   break;
+      case 'pre_round_countdown':
+        CoreM.run('Pre Round Countdown',message.round);
+        break;
       case 'clock':
         console.log('Time left: '+message.round.time);
         CoreM.run('Countdown',message.round);

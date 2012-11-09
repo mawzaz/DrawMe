@@ -11,12 +11,16 @@ function app()
 	Page = new page();
 	RoundM = new RoundManager();
 
+	this._preroundtimer = null;
+
 
 	//attach listeners
 	CoreM.listen('Pre Round Start',function(round){self.preNewRound(round)});
 	CoreM.listen('Round Start',function(round){self.newRound(round)});
 	CoreM.listen('Round End',function(round){self.endRound(round)});
 	CoreM.listen('Results',function(round){self.roundResults(round)});
+	CoreM.listen('Pre Round Countdown',function(round){self.preRoundCountdown(round)});
+
 
 }
 app.prototype =
@@ -213,24 +217,39 @@ app.prototype =
 		var flash = document.createElement('div');
 		flash.className = 'drawer-notification';
 		flash.id = "idle-wrapper-ctn";
-		$(flash).css('background-color','rgba(255,0,0,0.5)');
+		$(flash).css({
+			'background-color':'rgba(255,0,0,0.5)',
+		});
 		document.body.appendChild(flash);
 		$(flash).fadeOut(1000);
 
     var flash2 = document.createElement('div');
     $(flash2).height(150);
-    $(flash2).html('T I M E!');
-    $(flash2).css('color','white');
+
+
+    $(flash2).css({
+    	'color':'white',
+    });
     flash2.id = 'idle-ctn';
     flash.appendChild(flash2);
 
-
 		var msg1 = document.createElement('div');
-		$(msg1).html('TIMES UP');
 		$(msg1).css({
 			'color':'#DD4B39',
 			'font-size':'20px',
 		});
+    
+    if(!round.winner){
+			$(msg1).html('TIMES UP!');
+    }else if(round.winner === UM.me.guid){
+    	$(flash2).html('YOU GUESSED THE WORD!');
+    	$(flash2).css('width', '650px');
+    	$(flash).css('background-color','rgba(0,255,0,0.5)')
+    }else{
+	    $(flash2).html('SOMEONE GUESSED THE WORD!');
+    	$(flash2).css('width', '660px');
+    }
+
 		info.appendChild(msg1);
 
 		this._focusChat();
@@ -304,8 +323,17 @@ app.prototype =
 
 		Page.clear();
 		Page.disable();
+
+		if(this._preroundtimer && (!UM.get(round.drawer) || this._preroundtimer.time > 1)){
+			$(this._preroundtimer).html('ABORTED round '+(round.nb ? round.nb : 1));
+		}
 		// this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
 		// this._chat.appendChild(points);
+	},
+
+	preRoundCountdown : function(round){
+		$(this._preroundtimer).html('Starting round '+(round.nb ? round.nb : 1)+'... '+round.time);
+		this._preroundtimer.time = round.time;
 	},
 
 	preNewRound : function(round){
@@ -330,8 +358,10 @@ app.prototype =
 		$(info).css('font-size','24px');
 
 		var msg1 = document.createElement('div');
-		$(msg1).html('Starting round '+(round.nb ? round.nb+1 : 1)+'...');
+		$(msg1).html('Starting round '+(round.nb ? round.nb : 1)+'...');
 		info.appendChild(msg1);
+
+		this._preroundtimer = msg1;
 
 		// $(info).html('Starting new round... '+player.name+ 'get ready to DRAW');		
 
@@ -389,6 +419,8 @@ app.prototype =
 
 			return;
 		}
+
+		$(this._preroundtimer).html('STARTED round '+(round.nb ? round.nb : 1)+'...');
 
 		this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
 		Page.clear();
