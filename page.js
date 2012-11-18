@@ -5,6 +5,7 @@ function page(color)
 	
 	this.context = this.canvas.getContext('2d');
 	this.color = 'black';
+	this.width = 1;
 
 	this.positions = new Array();
 	this.disable();
@@ -17,9 +18,9 @@ page.prototype =
 		var self = this;
 		this.positions.push([ev.layerX,ev.layerY]);
 
-		this.beginPath({point:[ev.layerX,ev.layerY],color:this.color});
+		this.beginPath({point:[ev.layerX,ev.layerY],color:this.color, width:this.width});
 
-		Backend.sendStroke({type:"begin",point:[ev.layerX,ev.layerY],color:this.color});
+		Backend.sendStroke({type:"begin",point:[ev.layerX,ev.layerY],color:this.color, width:this.width});
 		
 		this.canvas.onmousemove = function(ev){self.onMouseMove(ev);}
 		this.canvas.onmouseup = function(ev){self.onMouseUp(ev);}
@@ -32,7 +33,7 @@ page.prototype =
 
 		this.drawPath({point:[ev.layerX,ev.layerY]});
 
-		Backend.sendStroke({type:"point",point:[ev.layerX,ev.layerY],color:this.color});
+		Backend.sendStroke({type:"point",point:[ev.layerX,ev.layerY],color:this.color, width:this.width});
 	},
 	
 	onMouseUp:function(ev)
@@ -40,8 +41,8 @@ page.prototype =
 		this.canvas.onmousemove = null;
 		this.canvas.onmouseup = null;
 
-		App.addStroke({points:this.positions, color:this.color});
-		Backend.sendStroke({type:"end",points:this.positions,color:this.color});
+		App.addStroke({points:this.positions, color:this.color, width:this.width});
+		Backend.sendStroke({type:"end",points:this.positions,color:this.color, width:this.width});
 
 		this.clear();
 		
@@ -50,6 +51,7 @@ page.prototype =
 
 	beginPath : function(stroke){
 		this.context.strokeStyle = stroke.color;
+		this.context.lineWidth = stroke.width;
 		this.context.beginPath();
 		this.context.moveTo(stroke.point[0], stroke.point[1]);
 	},

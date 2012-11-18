@@ -9,12 +9,10 @@ function RoundManager(){
   var canvasPos = CoreM.canvasPos;
 
   var round_ctn = document.createElement('div');
-  document.body.appendChild(round_ctn);
+  // document.body.appendChild(round_ctn);
+  App.mainCtn.appendChild(round_ctn);
+
   round_ctn.className = 'round-ctn';
-  $(round_ctn).css({
-    top:canvasPos.top+'px',
-    left:canvasPos.left+'px'
-  });
 
   var round_label = document.createElement('div');
   round_label.className = 'round-label';
@@ -28,11 +26,23 @@ function RoundManager(){
 
   var round_timer_ctn = document.createElement('div');
   round_timer_ctn.className = 'round-ctn';
-  document.body.appendChild(round_timer_ctn);
-  $(round_timer_ctn).css({
-    top:canvasPos.top + 'px',
-    left:canvasPos.left + canvasPos.w - $(round_timer_ctn).width() - 8 + 'px'
-  });
+  // document.body.appendChild(round_timer_ctn);
+  App.mainCtn.appendChild(round_timer_ctn);
+
+  $(round_timer_ctn).hide();
+  $(round_ctn).hide();
+  App.deferredWork.push(function(){
+    $(round_timer_ctn).css({
+      top:canvasPos.top + 'px',
+      left:canvasPos.left + canvasPos.w - $(round_timer_ctn).width() - 8 + 'px'
+    });
+    $(round_ctn).css({
+      top:canvasPos.top+'px',
+      left:canvasPos.left+'px'
+    });
+    $(round_timer_ctn).show();
+    $(round_ctn).show();
+  })
 
   var round_timer_label = document.createElement('div');
   round_timer_label.className = 'round-label';
@@ -139,7 +149,8 @@ RoundManager.prototype = {
     var wordctn = document.createElement('div');
     wordctn.id = 'word-ctn';
     $(wordctn).html(word);
-    document.body.appendChild(wordctn);
+    // document.body.appendChild(wordctn);
+    App.mainCtn.appendChild(wordctn);
     $(wordctn).css({
       top: canvasPos.top+'px',
       left: canvasPos.left+'px',
@@ -148,45 +159,130 @@ RoundManager.prototype = {
 
     var colorpalette = document.createElement('div');
     colorpalette.id = 'color-palette-ctn';
-    document.body.appendChild(colorpalette);
+    // document.body.appendChild(colorpalette);
+    App.mainCtn.appendChild(colorpalette);
     $(colorpalette).css({
-      top: canvasPos.top + canvasPos.h - $(colorpalette).height() +'px',
+      top: canvasPos.top + canvasPos.h - $(colorpalette).height() - 14 +'px',
       left: canvasPos.left+'px',
-      width : canvasPos.w+'px'
+      width : canvasPos.w-15+'px',
     });
 
-    var marker = function(color,image){
-      var ctn = document.createElement('image');
+    var selectedMarker = null;
+
+    var marker = function(color){
+      var ctn = document.createElement('div');
       ctn.className = 'marker-ctn';
+      $(ctn).css('background-color',color);
       $(ctn).click(function(){
         if(selectedMarker){
           selectedMarker.unselect();
         }
 
-        var openImage = image.split('.')[0]+'-open.png';
-
-        $(ctn).css('background-image','url('+openImage+')');
+        $(ctn).addClass('color-select');
         Page.color = color;
         selectedMarker = ctn;
       });
 
       ctn.unselect = function(){
-        $(ctn).css('background-image','url('+image+')');
+        $(ctn).removeClass('color-select');
       }
 
       ctn.unselect();
 
       colorpalette.appendChild(ctn);
+
+      return ctn;
     }
 
-    this._drawerui ={ wordctn : wordctn, colorpalette : colorpalette};
+    this._drawerui = { wordctn : wordctn, colorpalette : colorpalette};
 
-    // var bluemarker = marker('blue','/images/blue-marker.png');
-    // var greenmarker = marker('green','/images/green-marker.png');
-    // var pinkmarker = marker('pink','/images/pink-marker.png');
-    // var yellowmarker = marker('yellow','/images/yellow-marker.png');
+    var sizectn = document.createElement('div');
+    sizectn.id = "size-ctn";
+    sizectn.className = 'marker-ctn';
+    $(sizectn).css('border','2px solid rgba(0, 0, 0, 0.5)');
+    colorpalette.appendChild(sizectn);
 
-    // $(bluemarker).click();
+    $(sizectn).click(function(event){
+      event.stopPropagation();
+      $(sizeselect).show();
+    });
+    $(document.body).click(function(){
+      $(sizeselect).hide();
+    });
+
+    var sizeselect = document.createElement('div');
+    sizeselect.id = 'size-select';
+    $(sizeselect).hide();
+    colorpalette.appendChild(sizeselect);
+
+    var currentSize;
+
+    var createSizePreview = function(radius){
+      var sizepreview = document.createElement('canvas');
+      sizepreview.className = 'size-preview-canvas'
+      sizepreview.height = $(sizectn).height();
+      sizepreview.width = $(sizectn).width();
+      sizepreview.radius = radius;
+
+      //get a reference to the canvas
+      var ctx = sizepreview.getContext("2d");
+
+      //draw a circle
+      ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+      ctx.beginPath();
+      ctx.arc($(sizectn).width()/2, $(sizectn).height()/2-2, radius, 0, Math.PI*2, true); 
+      ctx.closePath();
+      ctx.fill();
+
+      sizepreview.select = function(){
+        Page.width = radius;
+        sizectn.appendChild(sizepreview);
+        currentSize=sizepreview;
+      };
+
+      sizepreview.unselect = function(){
+        sizeselect.appendChild(sizepreview);
+      };
+
+      $(sizepreview).click(function(e){
+        if(currentSize && sizepreview.radius !== currentSize.radius){
+          $(sizeselect).hide();
+          currentSize.unselect();
+          sizepreview.select();
+        }
+      });
+
+      return sizepreview;
+    };
+
+    var small = createSizePreview(1);
+    var medium = createSizePreview(4);
+    var large = createSizePreview(8);
+    var xlarge = createSizePreview(12);
+
+    small.select();medium.unselect();large.unselect();xlarge.unselect();
+
+    var black = marker('black');
+    var blue = marker('blue');
+    var green = marker('green');
+    var yellow = marker('yellow');
+    var red = marker('red');
+    var white = marker('white');
+
+    //add clear button
+    var clear = document.createElement('image');
+    clear.src = '/images/recycle_bin.png';
+    clear.id = 'clear-ctn';
+    clear.className = 'marker-ctn';
+    $(clear).click(function(){
+      Page.clear();
+      App.clear();
+      Backend.sendStroke({type:"clear"});
+    });
+
+    colorpalette.appendChild(clear);
+
+    $(black).click();
   },
 
   _removeDrawerUi :function(){

@@ -1,5 +1,6 @@
 function app()
 {
+	App = this;
 	var self = this;
 	this.deferredWork = new Array();
 	this.busy = true; //set to false in backend.js
@@ -67,6 +68,10 @@ app.prototype =
 				Page.clear();
 				this.addStroke(stroke);
 				break;
+			case "clear":
+				Page.clear();
+				this.clear();
+				break;
 		}
 	},
 
@@ -89,6 +94,7 @@ app.prototype =
     // context.strokeStyle = stroke.color;
     
     context.strokeStyle = stroke.color;
+    context.lineWidth = stroke.width;
     context.beginPath();
     context.moveTo(points[0][0],points[0][1]);
     for(var i=1;i<points.length;i++)
@@ -327,13 +333,17 @@ app.prototype =
 		if(this._preroundtimer && (!UM.get(round.drawer) || this._preroundtimer.time > 1)){
 			$(this._preroundtimer).html('ABORTED round '+(round.nb ? round.nb : 1));
 		}
+
+		this._preroundtimer = null;
 		// this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
 		// this._chat.appendChild(points);
 	},
 
 	preRoundCountdown : function(round){
-		$(this._preroundtimer).html('Starting round '+(round.nb ? round.nb : 1)+'... '+round.time);
-		this._preroundtimer.time = round.time;
+		if(this._preroundtimer){
+			$(this._preroundtimer).html('Starting round '+(round.nb ? round.nb : 1)+'... '+round.time);
+			this._preroundtimer.time = round.time;
+		}
 	},
 
 	preNewRound : function(round){
@@ -409,6 +419,10 @@ app.prototype =
 		$(this._chat).animate({scrollTop:this._chat.scrollHeight},'fast');
 	},
 
+	clear : function(){
+		this._canvas.getContext('2d').clearRect(0,0,this._canvas.width,this._canvas.height);
+	},
+
 	newRound : function(round){
 		var self = this;
 
@@ -466,8 +480,14 @@ app.prototype =
 			return div;
 		}
 
+		this.mainCtn = document.createElement("div");
+		this.mainCtn.id = "main-ctn";
+
+		document.body.appendChild(this.mainCtn);
+
 		var canvas = document.createElement("canvas");
 		canvas.id = 'canvas';
+		canvas.className = 'drawing-canvas';
 		canvas.height = $(document.body).height()-5;
 		canvas.width = 720;
 
@@ -475,6 +495,7 @@ app.prototype =
 
 		var proxycanvas = document.createElement("canvas");
 		proxycanvas.id = 'proxycanvas';
+		proxycanvas.className = 'drawing-canvas';
 		$(proxycanvas).css('background-color','transparent');
 		proxycanvas.height = canvas.height;
 		proxycanvas.width = canvas.width;
@@ -483,7 +504,7 @@ app.prototype =
 
 		//bug fix
 		this.deferredWork.push(function(){
-			canvas.height = $(document.body).height()-5;
+			canvas.height = 635;
 			proxycanvas.height = canvas.height;
 		});
 
@@ -491,9 +512,15 @@ app.prototype =
 		var lobby = document.createElement('div');
 		lobby.id='lobby';
 
-		document.body.appendChild(canvas);
-		document.body.appendChild(proxycanvas);
-		document.body.appendChild(lobby);
+		// document.body.appendChild(canvas);
+		// document.body.appendChild(proxycanvas);
+		// document.body.appendChild(lobby);
+
+		this.mainCtn.appendChild(canvas);
+		this.mainCtn.appendChild(proxycanvas);
+		this.mainCtn.appendChild(lobby);
+
+
 
 		//Players
 		var playersctn = document.createElement('div');

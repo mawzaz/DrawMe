@@ -29,11 +29,13 @@ _.getCurrentDrawing = function(room,cb){
     var fetchPage = function (pItr,pSize){
       var start = pageItr*pSize;
       var end = (pageItr+1)*pSize -1;
+      var stroke;
 
       client.lrange([key,start,end],function(err, data){
         //append the strokes
         for(var i in data){
-          if(JSON.parse(data[i]).type === 'end'){
+          stroke = JSON.parse(data[i]);
+          if(stroke && (stroke.type === 'end' || stroke.type === 'clear')){
             strokes.push(data[i]);
           }
         }

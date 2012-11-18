@@ -9,14 +9,18 @@
   top: 14px;
   border-radius: 4px;
 }
-canvas{
+.drawing-canvas{
   background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.4);
   /*box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);*/
   position: absolute;
   border-top-left-radius: 28px;
   border-top-right-radius: 28px;
+  top: 14px;
+  left: 14px;
 }
+
+
 
 #chat-main{
   position: absolute;
@@ -159,7 +163,10 @@ body{
 }
 
 #color-palette-ctn{
-
+  height : 50px; 
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 8px;
 }
 
 #idle-wrapper-ctn{
@@ -188,10 +195,34 @@ body{
 
 .marker-ctn{
   display: inline-block;
+  height: 40px;
+  width: 40px;
+  border-radius: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  margin-top: 2px;
 }
 
 .info-ctn{
   opacity: 0.7;
+}
+
+#main-ctn{
+  width: 1280px;
+  height: 666px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.color-select{
+  border: 4px solid rgba(255, 239, 127, 1);
+  height: 38px;
+  width: 38px;
 }
 
 
@@ -214,6 +245,11 @@ body{
   margin-bottom: -3px;
 }
 
+#clear-ctn{
+  float: right;
+  border: none;
+}
+
 .notification{
 }
 
@@ -224,6 +260,30 @@ body{
 .drawer-notification{
   z-index: 99;
   font-size: 40px;
+}
+
+#size-ctn{
+  background-color: white;
+  margin-right: 40px;
+  margin-left: 9px;
+  padding-top: 4px;
+  width: 44px;
+}
+
+#size-select{
+  position: absolute;
+  width: 44px;
+  top: -104px;
+  background-color: white;
+  border: 2px solid rgba(0, 0, 0, 0.5);
+  left: 17px;
+  border-bottom: none;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+}
+
+.size-preview-canvas{
+  cursor: pointer;
 }
 
 .round-over{
