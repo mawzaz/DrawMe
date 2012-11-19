@@ -95,6 +95,7 @@ app.prototype =
     
     context.strokeStyle = stroke.color;
     context.lineWidth = stroke.width;
+    context.lineCap = 'round';
     context.beginPath();
     context.moveTo(points[0][0],points[0][1]);
     for(var i=1;i<points.length;i++)
