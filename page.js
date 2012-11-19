@@ -52,6 +52,7 @@ page.prototype =
 	beginPath : function(stroke){
 		this.context.strokeStyle = stroke.color;
 		this.context.lineWidth = stroke.width;
+		this.context.lineCap = 'round';
 		this.context.beginPath();
 		this.context.moveTo(stroke.point[0], stroke.point[1]);
 	},
