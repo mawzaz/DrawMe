@@ -1,29 +1,100 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
+
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-<link rel='stylesheet' href="./style.css" type="text/css" media='screen'></link>
-<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Finger Paint">
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
-<script src="./socket.io/socket.io.js"></script>
-<script type="text/javascript" src="./app.js"></script>
-<script type="text/javascript" src="./page.js"></script>
-<script type="text/javascript" src="./Player.js"></script>
-<script type="text/javascript" src="./backend.js"></script>
-<script type="text/javascript" src="./usermanager.js"></script>
-<script type="text/javascript" src="./roundmanager.js"></script>
-<script type="text/javascript" src="./core.js"></script>
-<script type="text/javascript" src="./lib/sugar-1.3.5.min.js"></script>
 
 </head>
-<body>
-<script type="text/javascript">
-  firstNames = new Array("Runny", "Buttercup", "Dinky", "Stinky", "Crusty", "Greasy", "Gidget", "Cheesypoof", "Lumpy", "Wacky", "Tiny", "Flunky", "Fluffy", "Zippy", "Doofus", "Gobsmacked", "Slimy", "Grimy", "Salamander", "Oily", "Burrito", "Bumpy", "Loopy", "Snotty", "Irving", "Egbert");
-  lastNames = new Array("Snicker", "Buffalo", "Gross", "Bubble", "Sheep", "Corset", "Toilet", "Lizard", "Waffle", "Kumquat", "Burger", "Chimp", "Liver", "Gorilla", "Rhino", "Emu", "Pizza", "Toad", "Gerbil", "Pickle", "Tofu", "Chicken", "Potato", "Hamster", "Lemur", "Vermin");
-  lastNames2 = new Array("face", "dip", "nose", "brain", "head", "breath", "pants", "shorts", "lips", "mouth", "muffin", "butt", "bottom", "elbow", "honker", "toes", "buns", "spew", "kisser", "fanny", "squirt", "chunks", "brains", "wit", "juice", "shower");
 
-	App = new app();
-</script>
+<body background="images/blue-paper-background-lrg.jpeg">
+
+<div name ="login-box-container">
+<form action="/login" method="POST" name="loginForm">
+   <input type="text" name="nickName"/> NickName</br>
+   <input type="password" name="password"/> Password</br>
+   <input type="submit" value="Login" />
+</form>
+</div>
+
+</br>
+
+<div name ="registration-box-container">
+<form action="/register" method="POST" name="registrationForm" onsubmit="return validateRegistrationForm()">
+   <input type="text" name="firstName"/> First Name</br>
+   <input type="text" name="lastName"/> Last Name</br>
+   <input type="text" name="nickName"/> NickName (this is the name that will be displayed)</br>
+   <input type="text" name="email"/> Email</br>
+   <input type="password" name="password"/> Password</br>
+   <input type="password" name="confirmPassword"/> Confirm Password</br>
+   <input type="submit" value="Register" />
+</form>
+</div>
+
 </body>
+
+<script type="text/javascript">
+	function validateRegistrationForm(){
+		//validate firstName
+		var a = document.forms['registrationForm']['firstName'].value;
+		var alphaExp = /^[a-zA-Z]+$/;
+
+		if(a==null || a==''){
+			alert('FirstName must be filled out');
+			document.forms['registrationForm']['firstName'].focus();
+			return false;
+		}
+
+		if(!a.match(alphaExp)){
+			alert('Cannot have numbers...');
+			document.forms['registrationForm']['firstName'].focus();
+			return false;
+		}	
+
+		//validate nickname
+		var b = document.forms['registrationForm']['nickName'].value;
+		if(b==null || b==''){
+			alert('You must have a nickname');
+			document.forms['registrationForm']['nickName'].focus();
+			return false;
+		}
+
+		//validate email
+		var c = document.forms['registrationForm']['email'].value;
+		var atpos=c.indexOf("@");
+		var dotpos=c.lastIndexOf(".");
+
+		if (atpos<1 || dotpos<atpos+2 || dotpos+2>=c.length){
+			alert("Not a valid e-mail address");
+			document.forms['registrationForm']['email'].focus();
+			return false;
+		}
+
+		//validate passwords
+		var d = document.forms['registrationForm']['password'].value;
+		var e = document.forms['registrationForm']['confirmPassword'].value;
+
+		if(d==null || d=='' || e==null || e==''){
+			alert('Please enter a password and confirm');
+			document.forms['registrationForm']['password'].focus();
+			return false;
+		}
+
+		if(d!=e){
+			alert('Passwords do not match');
+			document.forms['registrationForm']['password'].focus();
+			return false;
+		}
+	}
+
+	function showlayer(layer){
+		var myLayer = document.getElementById(layer);
+
+		if(myLayer.style.display=="none" || myLayer.style.display==""){
+			myLayer.style.display="block";
+		} else { 
+			myLayer.style.display="none";
+		}
+	}
+</script>
 </html>
