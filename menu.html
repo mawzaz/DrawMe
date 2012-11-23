@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<link rel='stylesheet' href="./style.css" type="text/css" media='screen'></link>
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Finger Paint">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+
+
+</head>
+<body>
+<script type="text/javascript">
+  var div = document.createElement('div');
+  $(div).css({
+    backgroundColor:'black',
+    width:'200px';
+    height:'50px';
+  });
+
+  document.appendChild(div);
+
+  $(div).click(function(){
+    $.ajax({
+      type: 'POST',
+      url: '/random_game',
+      success: function(){
+        //redirect
+      },
+    });
+  });
+</script>
+</body>
+</html>
