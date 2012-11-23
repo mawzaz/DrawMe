@@ -7,15 +7,15 @@ var mysql = require("mysql");
 var _ = new Object();
 module.exports = _;
 
-var connection;
-
-_.connect = function(host,username,password){
-	connection = mysql.createConnection({
+var connection = mysql.createConnection({
 	    database : 'DrawMe',
-	    host     : host,
-	    user     : username,
-	    password : password,
+	    host     : 'localhost',
+	    user     : 'root',
+	    password : 'root',
 	});
+
+_.connect = function(){
+  connection.connect();
 	console.log("Connected to MYSQLDB");
 };
 
@@ -28,9 +28,11 @@ _.select = function(query,callback){
 	connection.query(query,function(err, rows,fields) {
   		if (err) throw err;
 
-  		if(rows)
+  		if(rows){
   			callback(rows);
-  		console.log("retrieved data succesfully");
+      }
+      
+    	console.log("retrieved data succesfully");
 	});
 }
 

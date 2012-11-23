@@ -1,78 +1,15 @@
 var io = require('socket.io'),
     express = require('express'),
     app = express(),
-    server = require('http').createServer(app)
-    redis_db = require('./redis-db.js');
+    server = require('http').createServer(app),
+    redis_db = require('./redis-db.js'),
+    redis_pubsub = require('redis'),
     node_guid = require('node-guid');
-    mysql      = require('./mysql-db.js');
-
 
 app.use(express.static(__dirname + '/'));
 app.use('/images', express.static(__dirname + '/'));
-app.use(express.bodyParser());
-
-//-----Maurice Stuff
-
-app.post('/login', function(req,res){
-
-    var nickName = req.body.nickName,
-        password = req.body.password;
-    
-    //console.log(JSON.stringify(req.body));
-    mysql.connect('localhost','root','');
-    
-    mysql.select("Select nickName, password from Users where nickName ='"+nickName+"'",function(data){
-
-        console.log(data);
-        if(data[0])
-            if(data[0].nickName == nickName && data[0].password == password){
-                console.log("signed in sucessful");
-                res.redirect('/app.html');
-            }
-            else{
-                console.log("invalid username/password");
-                //alert('Invalid username/password');
-            }
-        else{
-            console.log("returned empty data set");
-            res.redirect('index.html');
-        }
-
-        mysql.disconnect();
-
-        
-    });
-    // console.log(results[0]);
-    
-});
-
-app.post('/register', function(req,res){
-
-    var firstName = req.body.firstName,
-        lastName = req.body.lastName,
-        nickName = req.body.nickName,
-        email = req.body.email,
-        password = req.body.password;
-
-    mysql.connect('localhost','root','');
-    mysql.select("Select * from Users where nickName='"+nickName+"' or email='"+email+"'",function(data){
-
-        console.log(data);
-        if(data[0])
-            console.log("Cannot register, nickname or email already exist");
-        else{
-            mysql.insert("Insert into Users values('"+0+"','"+firstName+"','"+lastName+"','"+nickName+"','"+email+"','"+password+"')");
-            console.log("data inserted succesfully");
-        }
-        mysql.disconnect();
-    });
-
-    res.redirect('/index.html');
-})
-//------------------------------END OF Maurice
 
 io = io.listen(server,{ log: false });
-server.listen(8000);
 
 var rooms = {};
 
@@ -81,12 +18,26 @@ var MAX_TIME = 90000; //1 min 30 sec
 
 var WORDS = ['dog','cat','ball','couch','horse','house','money','human','bird'];
 
+var guid,token;
+
+var create = function(params){
+    server.listen(params.port);
+    token = params.token;
+    guid = params.guid;
+}
+
+exports.createGame = create;
+
 io.sockets.on('connection',function(socket){
     var channel = null;
     var room_nb = null;
     var player = null;
 
     socket.on('room_connect',function(data,cb){
+        if(data.token !== token){
+            //intruder
+            return;
+        }
         console.log('['+data.player.name+' IS JOINING ROOM #'+data.room+']');
 
         player = data.player;
@@ -98,7 +49,7 @@ io.sockets.on('connection',function(socket){
         
         if(!room){
             room = rooms[data.room] = {
-                guid:node_guid.new(),
+                guid:guid,
                 users:{},
                 users_count:0,
                 drawer_queue:[],

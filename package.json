@@ -5,6 +5,7 @@
     "socket.io" : "*",
     "express" : "*",
     "redis" : "*",
-    "node-guid" : "git://github.com/Reregistered/node-guid.git"
+    "node-guid" : "git://github.com/Reregistered/node-guid.git",
+    "crypto" : "*"
   }
 }
