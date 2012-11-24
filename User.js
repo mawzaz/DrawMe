@@ -80,10 +80,23 @@ UserDb.prototype =
 	                newUser.save(
 	                    function(err)
 	                    {
-	                        if(err)
+	                       if(err)
+	                       {
+	                           if(err.code == 11000) 
+	                           { 	                         
+		                           console.log("Attempt to create existing user");
+		                           callback(null, false);
+		                       }
+		                       else
+		                       {
+		                          console.log(err.err);
+		                          callback(err);
+		                       }
+	                        }
+	                        else
 	                        {
-	                            console.log("Error creating user:" +err.err);
-	                            callback(err);
+	                           console.log("New user created");
+	                           callback(null, true);
 	                        }
 	                    }); //newUser.save()
 	            }
@@ -99,15 +112,26 @@ UserDb.prototype =
     
     validateUser : function(email, password, callback)
     {
-        this.User.findOne({email:email.toUpperCase()}, {password : 1}, function(err, result){
-            bcrypt.compare(password, result.password, function(err, res)
-            {   
-                if(!err & res == true)
-                {
-                    console.log("User: \""+email +"\"logged in.");
-                }
-                callback(err, res);
-            });
+        this.User.findOne({email:email.toUpperCase()}, function(err, result){
+            if (result)
+            {
+	            bcrypt.compare(password, result.password, function(err, res)
+	            {   
+	                if(!err & res == true)
+	                {
+	                    console.log("User: \""+email +"\"logged in.");
+	                    callback(null, result);
+	                }
+	                else
+	                {
+	                   callback(err, false);
+	                } 
+	            });
+	        }
+	        else
+	        {
+	           callback(null, false);
+	        }
         });
     }
 }

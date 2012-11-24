@@ -11,7 +11,7 @@
 
 <div name ="login-box-container">
 <form action="/login" method="POST" name="loginForm">
-   <input type="text" name="nickName"/> NickName</br>
+   <input type="text" name="username"/> Email</br>
    <input type="password" name="password"/> Password</br>
    <input type="submit" value="Login" />
 </form>
@@ -21,8 +21,6 @@
 
 <div name ="registration-box-container">
 <form action="/register" method="POST" name="registrationForm" onsubmit="return validateRegistrationForm()">
-   <input type="text" name="firstName"/> First Name</br>
-   <input type="text" name="lastName"/> Last Name</br>
    <input type="text" name="nickName"/> NickName (this is the name that will be displayed)</br>
    <input type="text" name="email"/> Email</br>
    <input type="password" name="password"/> Password</br>
