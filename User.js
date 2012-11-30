@@ -135,22 +135,9 @@ UserDb.prototype =
         });
     },
 
-    getStats : function(nick,callback){
-    	console.log('User.js: getStats()');
-    	this.User.findOne({nickname:nick},function(err,result){
-
-    		if(result){
-    			console.log('Got Stats');
-    			callback(null,result);
-    		}
-    		else
-    			callback(err,false);
-    	});
-    },
-
-    getAccount : function(nick,callback){
+    getUserAccount : function(id,callback){
     	console.log('User.js: getAccount');
-    	this.User.findOne({nickname:nick}, function(err, result){
+    	this.User.findOne({_id:id}, function(err, result){
 
     		if(result){
     			console.log('Got Account');
@@ -161,22 +148,42 @@ UserDb.prototype =
     	});
     },
 
-    changeAccount : function(nick,pass,callback){
+    changeNickname : function(id,nick,callback){
+    	console.log('Changing the users nickname');
+
+    	this.User.findOne({_id:id}, function(err,user){
+
+    		if(user){
+    			console.log('changed nickname to'+nick);
+    			user.nickname = nick;
+    			user.save();
+    			callback(null,user);
+    		}else{
+    			console.log('could not find user');
+    			callback(err,false);
+    		}
+    	});
+    },
+
+    changeAccount : function(id,nick,oldpass,newpass,confpass,callback){
     	 console.log('User.js: getAccount');
     	 // this.User.update({nickname:'test1'}, {$inc: {points:1}});
 
-    	 this.User.findOne({nickname:'test1'}, function(err,res){
-    	 	if(!res){
+    	 this.User.findOne({_id:id, password:oldpass}, function(err,user){
+    	 	if(!user){
     	 		console.log('error getting results');
     	 		callback(err,false);
     	 	}
     	 	else{
-    	 		res.update({nickname:nick}, {$set: {nickname:nick}});
-    	 		console.log('Changed nickname to: '+nick);
-    	 		console.log('Changed password to: '+pass);
-    	 		callback(null,res);
+
+    	 		if(oldpass != user.password)
+    	 			user.password = newpass;
+
+    	 		console.log('Changed password to: '+newpass);
+    	 		user.save();
+    	 		callback(null,user);
     	 	}
-    	 })
+    	 });
 		
 		// this.User.update({nickname: nick}, {$set: { nickname:nick}}, function(err,res){
 		// 	if(err){

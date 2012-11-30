@@ -18,7 +18,7 @@
   var menuBar = document.createElement('div');
     $(menuBar).css({
     backgroundColor:'white',
-    width:'600px',
+    width:'900px',
     height:'50px'
   });
 
@@ -94,7 +94,7 @@
 
   //Random Game
   //==============================================
-    //Random game div
+  
   var randomButton = document.createElement('button');
   $(randomButton).css({
     backgroundColor:'violet',
@@ -116,6 +116,34 @@
 
   menuBar.appendChild(randomButton);
   //==============================================
+
+  //Logut button
+  var logoutForm = document.createElement('form');
+  $(logoutForm).css({
+    height:'50px',
+    width:'100px'
+  });
+  logoutForm.method ='GET';
+  logoutForm.action ='/logout';
+
+  var logoutButton = document.createElement('input');
+  logoutButton.value = 'Logout';
+  $(logoutButton).css({
+    backgroundColor:'#088A85',
+    width:'100px',
+    height:'50px'
+  });
+
+  logoutButton.onclick = function(){
+    logoutForm.submit();
+  }
+  
+  logoutForm.appendChild(logoutButton);
+
+
+  menuBar.appendChild(logoutForm);
+   //==============================================
+
   document.body.appendChild(menuBar);
   // document.body.appendChild(responseDiv);
 

@@ -77,12 +77,7 @@ client.on('message',function(channel,msg){
 
 
 app.post('/login', 
-    //passport.authenticate('local'), 
-    function (req, res)
-    {
-        res.redirect("/menu.html");
-    //    res.redirect("app.html");                             
-    });
+    passport.authenticate('local', {successRedirect:'/menu.html', failureRedirect:'/index.html'}));
 
 app.post("/test", function(res, req)
 {
@@ -103,19 +98,64 @@ app.post('/random_game', function(req, res)
 });
     
 
-
-app.post('/register', function(req,res){
-    
-
-    res.redirect('/index.html');
+//=================Register=====================
+app.post('/register', function(req,result){
+  
+  var email = req.body.username,
+      nickname = req.body.nickname,
+      pass = req.body.password,
+      pass_confirm = req.body.confirmPassword;
+      
+  user.createUser(email, nickname, pass, pass_confirm, function(err, res)
+  {
+    if(err)
+    {
+      // Something bad happened
+      console.log(err);
+    }  
+    else if (res)
+    {
+      console.log(res);
+      req.login(res, function(err){
+        if(err)
+        {
+          console.error("Error during login redirect");
+          console.error(err.stack);
+        }
+        else
+        {
+          result.redirect("/menu.html");
+        }
+      });
+      
+    }
+    else if (!res)
+    {
+      // User already exists
+      //TODO: Notify frontend
+      result.redirect("/");
+    }
+  });
 });
+//=================Register=====================//
+
+//===================Logout===================
+app.get('/logout', function(req,res){
+
+    console.log('Logging out');
+    req.logout();
+    res.redirect('/index.html');
+    
+});
+//===================Logout===================//
+
 
 //===================Getting the user stats===================
 app.post('/mystats', function(req,res){
 
     console.log('app.post("/mystats")');
-
-    user.getStats('test1',function(err,data){
+    console.log(req.body._id);
+    user.getUserAccount(req.user._id,function(err,data){
 
         if(data){
             console.log("Got data for stats");
@@ -136,7 +176,7 @@ app.post('/myaccount', function(req,res){
 
     console.log('app.post("/myaccount")');
 
-    user.getAccount('test1', function(err,data){
+    user.getUserAccount(req.user._id, function(err,data){
 
         if(data){
             console.log("Got data for account");
@@ -148,13 +188,36 @@ app.post('/myaccount', function(req,res){
 });
 //===================Getting the account form===================//
 
+app.post('/changeNickname', function(req,res){
+    
+    console.log('app.post(/changeNickname');
+    console.log('nickname: '+req.body.nickname);
+    var nick=req.body.nickname;
+
+    user.changeNickname(req.user._id, nick, function(err,data){
+        if(data){
+            res.redirect('/menu.html');
+        }else{
+            console.log('something went wrong');
+        }
+    });
+
+    // res.writeHead(200,{'Content-Type':'text/javascript'});
+    // res.end();
+    // res.redirect('/myaccount');
+});
+
 //===================Parsing the account form===================
 app.post('/changeAccount', function(req,res){
     
     console.log('app.post("/changeAccount"');
     console.log('nickname: '+req.body.nickname);
+    var nick=req.body.nickname,
+        oldpass=req.body.password,
+        newpass=req.body.newPassword,
+        confpass=req.body.confirmPassword;
 
-    user.changeAccount(req.body.nickname,req.body.password, function(err,data){
+    user.changeAccount(req.user._id, nick, oldpass, newpass, confpass, function(err,data){
         if(data){
             res.redirect('/menu.html');
         }else{
@@ -167,6 +230,8 @@ app.post('/changeAccount', function(req,res){
     // res.redirect('/myaccount');
 });
 //===================Parsing the account form===================
+
+
 
 /*app.post('/playnow',function(req,res){
     //1.get id of the user

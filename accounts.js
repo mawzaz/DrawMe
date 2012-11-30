@@ -10,13 +10,21 @@ function Account(data){
 
 	document.body.appendChild(this.maindiv);
 
-	var form = document.createElement('form');
-	$(form).css({
-		height:'800px',
+	var accountForm = document.createElement('form');
+	$(accountForm).css({
+		height:'600px',
 		width:'800px'
 	});
-	form.action = '/changeAccount';
-	form.method = 'POST';
+	accountForm.action = '/changeAccount';
+	accountForm.method = 'POST';
+
+	var nicknameForm = document.createElement('form');
+	$(nicknameForm).css({
+		height:'200px',
+		width:'800px'
+	});
+	nicknameForm.action = '/changeNickname';
+	nicknameForm.method = 'POST';
 	//==================Nickname menu==================
 
 	var nicknameDiv = document.createElement('div');
@@ -31,6 +39,14 @@ function Account(data){
 	var nicknameTextbox = document.createElement('input');
 	nicknameTextbox.type = 'text';
 	nicknameTextbox.name = 'nickname';
+
+	var nicknameSubmitButton = document.createElement('input');
+	nicknameSubmitButton.type ='button';
+	nicknameSubmitButton.value = 'Submit';
+	$(nicknameSubmitButton).css({
+		height:'20px',
+		width:'200px'
+	});
 	//==================Nickname menu==================//
 
 	//==================Password menu==================
@@ -76,17 +92,7 @@ function Account(data){
 	var passwordConfirmTextbox = document.createElement('input');
 	passwordTextbox.type = 'text';
 	passwordConfirmDiv.appendChild(passwordConfirmTextbox);
-	passwordConfirmTextbox.name = 'passwordConfirmTextbox'
-	//==================New Password menu==================//
-	form.appendChild(nicknameDiv);
-	form.appendChild(nicknameTextbox);
-	form.appendChild(passwordDiv);
-	form.appendChild(passwordTextbox);
-	form.appendChild(newPasswordDiv);
-	form.appendChild(newPasswordTextbox);
-	form.appendChild(passwordConfirmDiv);
-	form.appendChild(passwordConfirmTextbox);
-
+	passwordConfirmTextbox.name = 'passwordConfirm';
 
 	var submitButton = document.createElement('input');
 	submitButton.type = 'button';
@@ -95,45 +101,72 @@ function Account(data){
 		height:'20px',
 		width:'200px'
 	});
+	//==================New Password menu==================//
+	nicknameForm.appendChild(nicknameDiv);
+	nicknameForm.appendChild(nicknameTextbox);
+
+	accountForm.appendChild(passwordDiv);
+	accountForm.appendChild(passwordTextbox);
+	accountForm.appendChild(newPasswordDiv);
+	accountForm.appendChild(newPasswordTextbox);
+	accountForm.appendChild(passwordConfirmDiv);
+	accountForm.appendChild(passwordConfirmTextbox);
+
+
+	nicknameSubmitButton.onclick = function(){
+		if(validateNicknameForm())
+			nicknameForm.submit();
+	};
 
 	submitButton.onclick = function(){
-		form.submit();
+
+		if(validateAccountForm())
+			accountForm.submit();
+	};
+
+	nicknameForm.appendChild(nicknameSubmitButton);
+	accountForm.appendChild(submitButton);
+
+	this.maindiv.appendChild(nicknameForm)
+	this.maindiv.appendChild(accountForm);
+	// this.maindiv.appendChild(submitButton);
+
+	var validateNicknameForm = function(){
+		var a = nicknameForm['nickname'].value;
+		if(a==null || a ==''){
+			alert('Your nickname cannot be blank');
+			return false;
+		}
+		return true;
 	}
 
-	form.appendChild(submitButton);
+	var validateAccountForm = function(){
+		var a = accountForm['password'].value;
+		var d = accountForm['newPassword'].value;
+		var e = accountForm['passwordConfirm'].value;
 
-	this.maindiv.appendChild(form);
-	// this.maindiv.appendChild(submitButton);
+		if(a == null || a == ''){
+			alert('please enter your current password');
+			return false;
+		}
+		if(d==null || d=='' || e==null || e==''){
+			alert('Please enter new a password and confirm');
+			accountForm['password'].focus();
+			return false;
+		}
+
+		if(d!=e){
+			alert('Passwords do not match');
+			accountForm['password'].focus();
+			return false;
+		}
+	};
 
 }
 
 Account.prototype = {
 	destroy: function(){
 		$(this.maindiv).hide();
-	},
-
-	post_to_url: function(path, params, method) {
-    method = method || "post"; // Set method to post by default, if not specified.
-
-    // The rest of this code assumes you are not using a library.
-    // It can be made less wordy if you use one.
-    var form = document.createElement("form");
-    form.setAttribute("method", method);
-    form.setAttribute("action", path);
-
-    for(var key in params) {
-        if(params.hasOwnProperty(key)) {
-            var hiddenField = document.createElement("input");
-            hiddenField.setAttribute("type", "hidden");
-            hiddenField.setAttribute("name", key);
-            hiddenField.setAttribute("value", params[key]);
-
-            form.appendChild(hiddenField);
-         }
-    }
-
-    document.body.appendChild(form);
-    form.submit();
 	},
 
 }
