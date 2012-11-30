@@ -6,21 +6,105 @@
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Finger Paint">
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+<script type="text/javascript" src="./stats.js"></script>
+<script type="text/javascript" src="./accounts.js"></script>
+
 
 
 </head>
 <body>
 <script type="text/javascript">
-  var div = document.createElement('div');
-  $(div).css({
-    backgroundColor:'black',
+
+  var menuBar = document.createElement('div');
+    $(menuBar).css({
+    backgroundColor:'white',
+    width:'600px',
+    height:'50px'
+  });
+
+  var responseDiv = document.createElement('div');
+  $(responseDiv).css({
+    height:'800px',
+    width:'800px'
+  });
+
+  //Stats button
+  //==============================================
+  var statsButton = document.createElement('button');
+  $(statsButton).css({
+    backgroundColor:'red',
+    width:'200px',
+    height:'50px'
+  });
+  $(statsButton).html('Get Stats');
+  
+
+  var stats;
+  statsButton.onclick = function(){
+    $.ajax({
+      type: 'POST',
+      url: '/mystats',
+      success: function(data){
+        
+        $(responseDiv).html('');
+
+        if(stats)
+          stats.destroy();
+
+        if(account)
+          account.destroy();
+
+        stats = new Stats(data);
+
+      },
+    });
+  };
+  menuBar.appendChild(statsButton);
+  //==============================================
+  //Accounts button
+  //==============================================
+  var accountButton = document.createElement('button');
+  $(accountButton).css({
+    backgroundColor:'blue',
     width:'200px',
     height:'50px'
   });
 
-  document.body.appendChild(div);
+  $(accountButton).html('Account');
 
-  $(div).click(function(){
+  var account;
+  accountButton.onclick = function(){
+    $.ajax({
+      type: 'POST',
+      url: '/myaccount',
+      success: function(data){
+        //something happens
+        if(account)
+          account.destroy();
+        if(stats)
+          stats.destroy();
+
+        account = new Account(data);
+
+      },
+    });
+  };
+  menuBar.appendChild(accountButton);
+  //==============================================
+
+  //Random Game
+  //==============================================
+    //Random game div
+  var randomButton = document.createElement('button');
+  $(randomButton).css({
+    backgroundColor:'violet',
+    width:'200px',
+    height:'50px'
+  });
+  $(randomButton).html('Random Game');
+
+
+  $(randomButton).click(function(){
     $.ajax({
       type: 'POST',
       url: '/random_game',
@@ -29,6 +113,12 @@
       },
     });
   });
+
+  menuBar.appendChild(randomButton);
+  //==============================================
+  document.body.appendChild(menuBar);
+  // document.body.appendChild(responseDiv);
+
 </script>
 </body>
 </html>

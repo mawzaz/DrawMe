@@ -71,7 +71,6 @@ UserDb.prototype =
 	                var newUser = new self.User(
 	                    {
 	                        email:email.toUpperCase(), 
-	                        username:email.toUpperCase(),
 	                        password:hash, 
 	                        nickname:nickname, 
 	                        played:0, 
@@ -85,7 +84,7 @@ UserDb.prototype =
 	                       {
 	                           if(err.code == 11000) 
 	                           { 	                         
-		                           console.log("Attempt to create existing user failed, user already exists");
+		                           console.log("Attempt to create existing user");
 		                           callback(null, false);
 		                       }
 		                       else
@@ -93,15 +92,16 @@ UserDb.prototype =
 		                          console.log(err.err);
 		                          callback(err);
 		                       }
-	                        } // No error
+	                        }
 	                        else
 	                        {
-                            callback(null, newUser);
+	                           console.log("New user created");
+	                           callback(null, true);
 	                        }
-	                    }); //end newUser.save()
+	                    }); //newUser.save()
 	            }
-	            }); //end self.Hash()
-	    }//endif
+	            }); //self.Hash()
+	    }//if
 	    else
 	    {
 	        console.log("Error: input mismatch");
@@ -133,6 +133,62 @@ UserDb.prototype =
 	           callback(null, false);
 	        }
         });
-    }
+    },
+
+    getStats : function(nick,callback){
+    	console.log('User.js: getStats()');
+    	this.User.findOne({nickname:nick},function(err,result){
+
+    		if(result){
+    			console.log('Got Stats');
+    			callback(null,result);
+    		}
+    		else
+    			callback(err,false);
+    	});
+    },
+
+    getAccount : function(nick,callback){
+    	console.log('User.js: getAccount');
+    	this.User.findOne({nickname:nick}, function(err, result){
+
+    		if(result){
+    			console.log('Got Account');
+    			callback(null,result);
+    		}
+    		else
+    			callback(err,false);
+    	});
+    },
+
+    changeAccount : function(nick,pass,callback){
+    	 console.log('User.js: getAccount');
+    	 // this.User.update({nickname:'test1'}, {$inc: {points:1}});
+
+    	 this.User.findOne({nickname:'test1'}, function(err,res){
+    	 	if(!res){
+    	 		console.log('error getting results');
+    	 		callback(err,false);
+    	 	}
+    	 	else{
+    	 		res.update({nickname:nick}, {$set: {nickname:nick}});
+    	 		console.log('Changed nickname to: '+nick);
+    	 		console.log('Changed password to: '+pass);
+    	 		callback(null,res);
+    	 	}
+    	 })
+		
+		// this.User.update({nickname: nick}, {$set: { nickname:nick}}, function(err,res){
+		// 	if(err){
+		// 		console.log('could not update');
+		// 		callback(err,false);
+		// 	}
+		// 	else{
+		// 		console.log('update succesfull');
+		// 		callback(null,true);
+		// 	}
+		// });
+    },
+
 }
 module.exports = new UserDb();
