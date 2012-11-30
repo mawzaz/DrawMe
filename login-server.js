@@ -46,7 +46,8 @@ passport.use(new LocalStrategy(function(username, password, done)
 {
   user.validateUser(username, password, function(err, user)
   {
-    console.log(util.format("Logging in with User: %s, Password: %s", username, password));
+    console.log(util.format("Logging in with User: %s, Password: %s", 
+                                                      username, password));
     if (err) {return done(err);}
     if (!user)
     {
@@ -82,24 +83,29 @@ client.on('message',function(channel,msg){
   }
 });
 
+app.post('/login', passport.authenticate('local',
+  { successRedirect: "/menu.html",
+    failureRedirect:"/index.html"}));
 
-app.post('/login', 
-  passport.authenticate('local'), 
-  function (req, res)
-  {
-    res.redirect("/menu.html", function(err){
-      if(err)
-      {
-        console.error("Error during login redirect")
-      }
-    });
-  //  res.redirect("app.html");               
-  });
+
+//app.post('/login', 
+//  passport.authenticate('local'), 
+//  function (req, res)
+//  {
+//      res.redirect("/menu.html");
+//  });
 
 app.post("/test", function(res, req)
 {
   console.log(req.user);
 });
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+
 
 app.post('/random_game', function(req, res)
 {
