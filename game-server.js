@@ -6,11 +6,16 @@ var io = require('socket.io'),
     redis_pubsub = require('redis'),
     node_guid = require('node-guid');
 
-app.use(express.static(__dirname + '/'));
+app.use('/',express.static(__dirname + '/'));
 app.use('/images', express.static(__dirname + '/'));
 
 io = io.listen(server,{ log: false });
 server.listen(8001);
+
+app.get('/app', function (req, res) {
+    console.log("GETTING HTML");
+    res.sendfile(__dirname + '/app.html');
+});
 
 var rooms = {};
 
@@ -99,7 +104,6 @@ io.sockets.on('connection',function(socket){
     socket.on('room_connect',function(data,cb){
         console.log('[ '+data.player.name+' IS JOINING A GAME ]');
 
-        var data = 
         if(!usersExpectedToJoin[data.player.guid] || room.users_count >= MAX_PLAYERS){
           return;
         }else if(usersExpectedToJoin[data.player.guid]){

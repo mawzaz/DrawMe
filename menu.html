@@ -6,6 +6,9 @@
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Finger Paint">
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+<script type="text/javascript" src="./stats.js"></script>
+<script type="text/javascript" src="./accounts.js"></script>
+
 
 
 </head>
@@ -15,16 +18,8 @@
 <script type="text/javascript">
   var menuDiv = document.getElementById('menu');
   menuDiv.className = "fit";
-
-  var div = document.createElement('div');
-  $(div).css({
-    backgroundColor:'black',
-    width:'200px',
-    height:'50px'
-  }); 
-
-  menuDiv.appendChild(div);
-
+  document.body.appendChild(menuDiv);
+  
 
   var iframeWrapper = document.createElement("div");
   iframeWrapper.id = "iframe-wrapper";
@@ -36,8 +31,83 @@
   var iframe = document.createElement("iframe");
   iframeWrapper.appendChild(iframe);
 
+  var menuBar = document.createElement('div');
+  menuBar.id = "main-ctn";
 
-  $(div).click(function(){
+  menuBar.show = function(){$(menuBar).children().show()};
+
+  //Stats button
+  //==============================================
+  var statsButton = document.createElement('div');
+  statsButton.className= "button";
+  $(statsButton).html('My Stats');
+  $(statsButton).hover(function(){
+    $(this).addClass('stats');
+  },function(){
+    $(this).removeClass('stats');
+  });
+  
+
+  var optionsDiv;
+  statsButton.onclick = function(){
+    $.ajax({
+      type: 'POST',
+      url: '/mystats',
+      success: function(data){
+        var stats = new Stats(data,menuBar);
+        $(menuBar).children().hide();
+        $(menuBar).append(stats.maindiv);
+
+      },
+    });
+  };
+  menuBar.appendChild(statsButton);
+  //==============================================
+  //Accounts button
+  //==============================================
+  var accountButton = document.createElement('div');
+  accountButton.className= "button";
+  $(accountButton).html('Settings');
+  $(accountButton).hover(function(){
+    $(this).addClass('account');
+  },function(){
+    $(this).removeClass('account');
+  });
+
+  var account;
+  accountButton.onclick = function(){
+    $.ajax({
+      type: 'POST',
+      url: '/myaccount',
+      success: function(data){
+        //something happens
+        if(account)
+          account.destroy();
+        if(stats)
+          stats.destroy();
+
+        account = new Account(data);
+
+      },
+    });
+  };
+  menuBar.appendChild(accountButton);
+  //==============================================
+
+  //Random Game
+  //==============================================
+  
+  var randomButton = document.createElement('div');
+  randomButton.className= "button";
+  $(randomButton).html('Play Now! :)');
+  $(randomButton).hover(function(){
+    $(this).addClass('random');
+  },function(){
+    $(this).removeClass('random');
+  });
+
+
+  $(randomButton).click(function(){
     $.ajax({
       type: 'POST',
       url: '/random_game',
@@ -51,7 +121,7 @@
         iframe.height = window.innerHeight;
         iframe.width = window.innerWidth;
 
-        iframe.src = 'http://'+ location.hostname +':8001/app.html';
+        iframe.src = 'http://'+ location.hostname +':8001/app';
 
         $(menuDiv).hide();
 
@@ -60,6 +130,37 @@
       },
     });
   });
+  $(menuBar).prepend(randomButton);
+  //==============================================
+
+  //Logut button
+  var logoutForm = document.createElement('form');
+  logoutForm.method ='GET';
+  logoutForm.action ='/logout';
+
+  var logoutButton = document.createElement('div');
+  $(logoutButton).html('Logout');
+  logoutButton.className= "button";
+  $(logoutButton).hover(function(){
+    $(this).addClass('logout');
+    $(this).html(':(');
+  },function(){
+    $(this).removeClass('logout');
+    $(this).html('Logout');
+  });
+
+  logoutButton.onclick = function(){
+    logoutForm.submit();
+  }
+  
+  logoutForm.appendChild(logoutButton);
+
+
+  menuBar.appendChild(logoutForm);
+   //==============================================
+
+  menuDiv.appendChild(menuBar);
+  // document.body.appendChild(responseDiv);
 
 </script>
 </body>

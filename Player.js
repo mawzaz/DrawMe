@@ -1,6 +1,8 @@
 function Player(params){  
   params = params || {};
+  params.color = params.color || this._generateRandomColor();
   this.name = params.name || this._generateName();
+
   this.color = this._generateColor(params.color[0],params.color[1],params.color[2]);
   this.guid = params.guid || this._generateGuid();
 
@@ -22,6 +24,15 @@ Player.prototype = {
 
   _generateColor : function(red,green,blue){
     return 'rgba('+red+','+green+','+blue+',0.8)';
+  },
+
+  _generateRandomColor : function(){
+    red = Math.floor((Math.random()*255));
+    green = Math.floor((Math.random()*255));
+    blue = Math.floor((Math.random()*255));
+    arr = [red,green,blue];
+
+    return arr;
   },
 
   _generateGuid : function(){

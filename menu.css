@@ -10,3 +10,94 @@ iframe {
   left: 0;
   right: 0;
 }
+
+body{
+  background-image: url(./images/background_paper_tile.jpeg);
+  font-family: "Finger Paint";
+  padding: 5px;
+  color: rgba(0, 0, 0, 0.7);
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+#main-ctn {
+  width: 700px;
+  height: 500px;
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  box-shadow: 1px 1px 1px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+
+
+.button{
+  width: 263px;
+  text-align: center;
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: -1px -1px 0px black;
+  border: 1px solid transparent;
+  margin-left: 219px;
+  font-size: 32px;
+  margin-top: 60px;  
+}
+
+.button:hover {
+  box-shadow: 1px 1px rgba(0,0,0,0.4);
+}
+
+.button:active{
+  box-shadow:inset 1px 2px rgba(0,0,0,0.4);
+
+}
+
+.account{
+  background-image: -webkit-linear-gradient(top,#7F4DFE,#7546EB);
+}
+
+.random{
+  background-image: -webkit-linear-gradient(top,#4D90FE,#4787ED);
+
+}
+
+.stats{
+  background-image: -webkit-linear-gradient(top,#DD4B39,#D14836);
+
+}
+
+.logout{
+  background-image: -webkit-linear-gradient(top,#2E2E2E,#212121);
+}
+
+.options-ctn{
+  height: 100%;
+  width: 100%;
+}
+
+.return-button{
+  font-size: 20px;
+  width: auto;
+  position: absolute;
+  left: 9px;
+  top: 9;
+  margin: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.label{
+  color: white;
+  width: 100%;
+  text-align: center;
+  font-size: 32px;
+  margin-top: 80px;
+}
