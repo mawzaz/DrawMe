@@ -6,6 +6,9 @@
     "express" : "*",
     "redis" : "*",
     "node-guid" : "git://github.com/Reregistered/node-guid.git",
-    "crypto" : "*"
+    "mongoose" : "*",
+    "passport" : "*",
+    "passport-local" : "*",
+    "bcrypt" : "*"
   }
 }

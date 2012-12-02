@@ -32,6 +32,8 @@ function RoundManager(){
   $(round_timer_ctn).hide();
   $(round_ctn).hide();
   App.deferredWork.push(function(){
+    canvasPos = CoreM.getCanvasPos();
+    
     $(round_timer_ctn).css({
       top:canvasPos.top + 'px',
       left:canvasPos.left + canvasPos.w - $(round_timer_ctn).width() - 8 + 'px'

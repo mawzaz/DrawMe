@@ -1,4 +1,4 @@
-function app()
+function app(player)
 {
 	App = this;
 	var self = this;
@@ -7,8 +7,8 @@ function app()
 	this._init();
 	CoreM = new Core();
 	// IA = new InputAdapter(); add support for touch devices
-	UM = new UserManager();
-	Backend = new Backend(1);
+	UM = new UserManager(player);
+	Backend = new Backend();
 	Page = new page();
 	RoundM = new RoundManager();
 
@@ -113,7 +113,7 @@ app.prototype =
 
 	addPlayer : function(player,live){
 		if(UM.me.guid === player.guid)
-			player.name = '*'+player.name;
+			player.name = '(Me) '+player.name;
 		var newplayer = new Player(player);
 		
 		if(UM.add(newplayer)){

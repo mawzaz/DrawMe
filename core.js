@@ -1,6 +1,6 @@
 function Core(){
   this._events = {};
-  this.canvasPos = $('#canvas').offset();
+  this.canvasPos = $('#canvas').position();
   this.canvasPos.w = $('#canvas').width();
   this.canvasPos.h = $('#canvas').height();
 }
@@ -23,5 +23,13 @@ Core.prototype = {
       this._events[evhandler][i](data);
     }
   },
+
+  getCanvasPosition : function(){
+    this.canvasPos = $('#canvas').position();
+    this.canvasPos.w = $('#canvas').width();
+    this.canvasPos.h = $('#canvas').height();
+
+    return this.canvasPos;
+  }
 
 }

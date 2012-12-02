@@ -7,7 +7,7 @@ function page(color)
 	this.color = 'black';
 	this.width = 1;
 
-	this.positions = new Array();
+	this.positions;
 	this.disable();
 }
 
@@ -16,6 +16,8 @@ page.prototype =
 	onMouseClick:function(ev)
 	{
 		var self = this;
+
+		this.positions = new Array();
 		this.positions.push([ev.layerX,ev.layerY]);
 
 		this.beginPath({point:[ev.layerX,ev.layerY],color:this.color, width:this.width});
@@ -46,7 +48,6 @@ page.prototype =
 
 		this.clear();
 		
-		this.positions = new Array();
 	},
 
 	beginPath : function(stroke){
@@ -69,7 +70,10 @@ page.prototype =
 	},
 
 	disable:function(){
+		this.clear();
 		this.canvas.onmousedown = null;
+		this.canvas.onmousemove = null;
+		this.canvas.onmouseup = null;
 	},
 
 	enable:function(){

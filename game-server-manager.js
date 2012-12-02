@@ -4,6 +4,9 @@ var redis = require("redis"),
     node_guid = require('node-guid');
 
 client.subscribe('randomGame');
+client.subscribe('endGameServer');
+client.subscribe('playerCount');
+
 
 var rooms = {};
 var availablePorts = [];
@@ -11,7 +14,7 @@ var waitingQueue = [];
 
 var MAX_PLAYERS = 5;
 
-for(var i=8001; i < 8100; i++){
+for(var i=8002; i < 8100; i++){
   availablePorts.push(i);
 }
 
@@ -23,24 +26,24 @@ client.on('message',function(channel,message){
       if(!room){
         console.log('All rooms are full.');
         //create new room
-        room = createGame(function(room){
-          console.log('Created a new game... Tell him to join room with guid ',room.guid);
-          client.publish('joinGame',room);
-        });
+        room = createGame();
+        console.log('Created a new game... Tell him to join room with guid ',room.guid);
       }else{
         console.log('Tell him to join room with guid ',room.guid);
-        client.publish('joinGame',room);
       }
+      room.playerExpectedToJoin(message.playerId);
+
+      client.publish('joinGame',{room:room, playerId:message.playerId});
       break;
 
     case 'endGameServer':
-      validate(message.token,message.guid,function(room){
+      validate(message.guid,function(room){
         delete rooms[message.guid];
       });
       break;
 
     case 'playerCount':
-      validate(message.token,message.guid,function(room){
+      validate(message.guid,function(room){
         room.players = message.players;
       });
       break;
@@ -49,10 +52,9 @@ client.on('message',function(channel,message){
 
 var validate = function(token,guid,cb){
   var guid = message.guid;
-  var token = message.token;
 
   var room = rooms[guid];
-  if(room && room.token === token){
+  if(room){
     cb(room);
   }
 }
@@ -72,30 +74,29 @@ var checkAvailableGames = function(){
   return room;
 }
 
-var createGame = function(cb){
+var createGame = function(){
   console.log('Creating new game')
-  crypto.randomBytes(48, function(ex, buf) {
-    var port = getPort();
-    if(port){
-      var token = buf.toString('hex');
-      var guid = node_guid.new();
 
-      rooms[guid] = {
-        token : token,
-        players : 0,
-        port: port
-      }
+  var port = getPort();
 
-      require('game-server.js').createGame({token:token,guid:guid,port:port});
+  if(port){
+    var guid = node_guid.new();
 
-      cb(rooms[guid]);
-    }else{
-      //all ports are taken... put user in queue 
+    rooms[guid] = {
+      players : 0,
+      port: port
     }
-  });
+
+    require('game-server.js').createGame({guid:guid,port:port});
+
+    return rooms[guid];
+  }else{
+    //all ports are taken... put user in queue 
+    return null;
+  }
 }
 
-var getPort(){
+var getPort = function(){
   if(availablePorts.length){
     var index = Math.floor(Math.random()*availablePorts.length);
 

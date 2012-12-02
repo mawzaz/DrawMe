@@ -4,34 +4,77 @@
 
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<link rel='stylesheet' href="./index.css" type="text/css" media='screen'></link>
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Finger Paint">
 
 </head>
 
 <body background="images/blue-paper-background-lrg.jpeg">
 
-<div name ="login-box-container">
-<form action="/login" method="POST" name="loginForm">
-   <input type="text" name="username"/> Email</br>
-   <input type="password" name="password"/> Password</br>
-   <input type="submit" value="Login" />
-</form>
-</div>
+<div id="title">Welcome to Draw Me! :)</div>
 
-</br>
+<div id="main-ctn">
+	<div id ="login-box-container">
+		<form action="/login" method="POST" name="loginForm">
+			<div class = "input-box-wrapper">
+		   	<input class = "blur" id="username" type="text" name="username"/>
+			</div>
+			<div class = "input-box-wrapper">
+				<div id="login-password-label" class="password-wrapper blur"></div> 
+			  <input id="password" type="password" name="password" class="password"/>
+		  </div>
+		  <div id = "loginwrapper" class="button">
+		   	<input id= "login" type="submit" value="Login" />
+		 </div>
+		</form>
+	</div>
 
-<div name ="registration-box-container">
-<form action="/register" method="POST" name="registrationForm" onsubmit="return validateRegistrationForm()">
-   <input type="text" name="nickName"/> NickName (this is the name that will be displayed)</br>
-   <input type="text" name="email"/> Email</br>
-   <input type="password" name="password"/> Password</br>
-   <input type="password" name="confirmPassword"/> Confirm Password</br>
-   <input type="submit" value="Register" />
-</form>
+	<div class="seperator"></div>
+
+	<div id ="registration-box-container">
+		<form action="/register" method="POST" name="registrationForm" onsubmit="return validateRegistrationForm()">
+			<div class = "input-box-wrapper blur">
+			   <input class = "blur" id="nickname" type="text" name="nickName"/>
+			</div>
+			<div class = "input-box-wrapper blur">
+			   <input class = "blur" id="email" type="text" name="email"/>
+			</div>
+			<div class = "input-box-wrapper">
+				<div id="reg-password-label" class="password-wrapper blur"></div> 
+
+			   <input id="password-reg" type="password" name="password" class="password"/>
+			</div>
+			<div class = "input-box-wrapper">
+				<div id="confirm-password-label" class="password-wrapper blur"></div> 
+
+			   <input id="confirm-password" type="password" name="confirmPassword" class="password"/>
+			</div>
+			<div id = "registerwrapper" class="button">
+			   <input id = "register" type="submit" value="Register" />
+			</div>
+		</form>
+	</div>
+
 </div>
 
 </body>
 
 <script type="text/javascript">
+
+	
+	var firstNames = new Array("Runny", "Buttercup", "Dinky", "Stinky", "Crusty", "Greasy", "Gidget", "Cheesypoof", "Lumpy", "Wacky", "Tiny", "Flunky", "Fluffy", "Zippy", "Doofus", "Gobsmacked", "Slimy", "Grimy", "Salamander", "Oily", "Burrito", "Bumpy", "Loopy", "Snotty", "Irving", "Egbert");
+  var lastNames = new Array("Snicker", "Buffalo", "Gross", "Bubble", "Sheep", "Corset", "Toilet", "Lizard", "Waffle", "Kumquat", "Burger", "Chimp", "Liver", "Gorilla", "Rhino", "Emu", "Pizza", "Toad", "Gerbil", "Pickle", "Tofu", "Chicken", "Potato", "Hamster", "Lemur", "Vermin");
+  var lastNames2 = new Array("face", "dip", "nose", "brain", "head", "breath", "pants", "shorts", "lips", "mouth", "muffin", "butt", "bottom", "elbow", "honker", "toes", "buns", "spew", "kisser", "fanny", "squirt", "chunks", "brains", "wit", "juice", "shower");
+
+
+  function randomNickname(){
+    return firstNames[Math.floor(Math.random()*firstNames.length)]+' '+lastNames[Math.floor(Math.random()*lastNames.length)];+lastNames2[Math.floor(Math.random()*lastNames2.length)];
+  };
+
+	$(document).ready(function(){
+		// $("#nickname").val(randomNickname());
+	});
+
 	function validateRegistrationForm(){
 		//validate firstName
 		var a = document.forms['registrationForm']['firstName'].value;
@@ -70,8 +113,9 @@
 
 		//validate passwords
 		var d = document.forms['registrationForm']['password'].value;
+		
 		var e = document.forms['registrationForm']['confirmPassword'].value;
-
+		
 		if(d==null || d=='' || e==null || e==''){
 			alert('Please enter a password and confirm');
 			document.forms['registrationForm']['password'].focus();
@@ -93,6 +137,91 @@
 		} else { 
 			myLayer.style.display="none";
 		}
+	}
+
+	var regPassword = document.getElementById("password-reg");
+
+	var d = document.getElementById("reg-password-label");
+	$(d).html("Password");
+	$(d).click(function(){onBlurFocusDiv(d,regPassword,'Password');});
+
+	$(regPassword).blur(function(){
+		onBlurFocusDiv(d,regPassword,'Password',true);
+	});
+
+
+	var confirmPassword = document.getElementById("confirm-password");
+
+	var e = document.getElementById("confirm-password-label");
+	$(e).html("Confirm");
+	$(e).click(function(){onBlurFocusDiv(e,confirmPassword,'Confirm');});
+
+	$(confirmPassword).blur(function(){
+		onBlurFocusDiv(e,confirmPassword,'Confirm',true);
+	});
+
+	var c = document.getElementById("email");
+	c.value = "Email";
+	$(c).blur(function(){onBlur(c,'Email');});
+	$(c).focus(function(){onFocus(c,'Email');});
+
+	var b = document.getElementById("nickname");
+	b.value = "Nickname";
+	$(b).blur(function(){onBlur(b,'Nickname');});
+	$(b).focus(function(){onFocus(b,'Nickname');});
+
+	var a = document.getElementById("username");
+	a.value = "Email";
+	$(a).blur(function(){onBlur(a,'Email');});
+	$(a).focus(function(){onFocus(a,'Email');});
+
+	var loginPassword = document.getElementById("password");
+
+	var f = document.getElementById("login-password-label");
+	$(f).html("Password");
+	$(f).click(function(){onBlurFocusDiv(f,loginPassword,'Password');});
+
+	$(loginPassword).blur(function(){
+		onBlurFocusDiv(f,loginPassword,'Password',true);
+	});
+
+
+
+	var onBlur = function(ctn,defaultText){
+		if(ctn.value === ""){
+			ctn.value = defaultText;
+			$(ctn).css('text-align','right');
+		}
+		$(ctn).addClass('blur');
+		$(ctn).removeClass('focus');
+	}
+
+	var onBlurFocusDiv  = function(ctn,wrappedDiv, defaultText, wrappedDivCaller){
+		if($(ctn).html() === "" && wrappedDiv.value === ""){
+			$(ctn).css('text-align','right');
+			$(ctn).html(defaultText);
+			$(ctn).addClass('blur');
+			$(ctn).removeClass('focus');
+		} else if($(ctn).html() === defaultText && wrappedDiv.value === ""){
+			$(ctn).html("");
+			$(ctn).removeClass('blur');
+			$(ctn).addClass('focus');
+			$(wrappedDiv).focus();
+		} else if(wrappedDiv.value !== "" && !wrappedDivCaller){
+			$(wrappedDiv).focus();
+			$(ctn).addClass('focus');
+		} else if(wrappedDivCaller){
+			$(ctn).removeClass('focus');
+		}
+	}
+
+	var onFocus = function(ctn,defaultText, text){
+		if(ctn.value === defaultText){
+			ctn.value = "";
+			$(ctn).css('text-align','left');
+		}	
+		$(ctn).removeClass('blur');
+		$(ctn).addClass('focus');
 	}
 </script>
 </html>

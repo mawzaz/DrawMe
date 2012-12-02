@@ -1,7 +1,7 @@
-function UserManager(){
+function UserManager(player){
   this.players = {};
 
-  this.me = new Player();
+  this.me = new Player(player);
 }
 
 UserManager.prototype = {

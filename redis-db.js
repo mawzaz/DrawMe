@@ -49,7 +49,7 @@ _.getCurrentDrawing = function(room,cb){
           })
         }
       });
-    }
+    };
 
     // now iterate over the list appending and joining as needed
     process.nextTick(function(){

@@ -1,7 +1,7 @@
 function Player(params){  
   params = params || {};
   this.name = params.name || this._generateName();
-  this.color = params.color || this._generateColor();
+  this.color = this._generateColor(params.color[0],params.color[1],params.color[2]);
   this.guid = params.guid || this._generateGuid();
 
   var div = document.createElement('div');
@@ -20,11 +20,7 @@ Player.prototype = {
     return firstNames[Math.floor(Math.random()*firstNames.length)]+' '+lastNames[Math.floor(Math.random()*lastNames.length)];+lastNames2[Math.floor(Math.random()*lastNames2.length)];
   },
 
-  _generateColor : function(){
-    var red = Math.floor((Math.random()*255));
-    var green = Math.floor((Math.random()*255));
-    var blue = Math.floor((Math.random()*255));
-
+  _generateColor : function(red,green,blue){
     return 'rgba('+red+','+green+','+blue+',0.8)';
   },
 

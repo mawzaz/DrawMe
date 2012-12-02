@@ -68,9 +68,18 @@ var client2 = redis.createClient();
 
 
 client.on('message',function(channel,msg){
+    msg = JSON.parse(msg);
     switch(channel){
       case 'joinGame':
-        requests[msg.id].redirect(msg.url)
+        console.log("msg = ",msg);
+        var res = requests[msg.guid];
+        res.writeHead(200, {
+          'Content-Type': 'application/json' 
+        });
+        res.write(JSON.stringify(msg));
+        res.end();
+
+        delete requests[msg.guid];
         break;
     }
 });
@@ -94,7 +103,8 @@ app.post('/random_game', function(req, res)
     if (req.user)
     {
         console.log("User logged in, joining random server");
-        client2.publish("randomGame", req.user);
+        client2.publish("randomGame", JSON.stringify({playerId : req.user._id, name:req.user.nickname}));
+        requests[req.user._id] = res;
     }
     else
     {

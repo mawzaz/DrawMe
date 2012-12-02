@@ -10,6 +10,7 @@ app.use(express.static(__dirname + '/'));
 app.use('/images', express.static(__dirname + '/'));
 
 io = io.listen(server,{ log: false });
+server.listen(8001);
 
 var rooms = {};
 
@@ -18,15 +19,77 @@ var MAX_TIME = 90000; //1 min 30 sec
 
 var WORDS = ['dog','cat','ball','couch','horse','house','money','human','bird'];
 
-var guid,token;
+var MAX_PLAYERS = 5;
 
-var create = function(params){
-    server.listen(params.port);
-    token = params.token;
-    guid = params.guid;
-}
+var publisher_client = redis_pubsub.createClient();
 
-exports.createGame = create;
+var subscriber_client = redis_pubsub.createClient();
+subscriber_client.subscribe('randomGame');
+
+var usersExpectedToJoin = {}
+
+subscriber_client.on('message',function(channel,message){
+  message = JSON.parse(message);
+  switch(channel){
+    case 'randomGame':
+      console.log('Player with ID = ',message.playerId,' wants to join a randomGame');
+      var room = checkAvailableGames();
+      console.log('Tell him to join room with guid = ',room.guid);
+
+      var player = {guid: message.playerId, name: message.name, color:generateColor(room)};
+      
+      console.log("Expecting user to join:",player);
+
+      usersExpectedToJoin[player.guid] = {room:room, player:player};
+
+      publisher_client.publish('joinGame',JSON.stringify(player));
+      break;
+  }
+});
+
+var generateColor = function(room){
+  var red,blue,green,key,arr;
+  do{
+    red = Math.floor((Math.random()*255));
+    green = Math.floor((Math.random()*255));
+    blue = Math.floor((Math.random()*255));
+    arr = [red,green,blue];
+    key = arr.join();
+  }while(room.colors[key]);
+
+  room.colors[key] = 1;
+
+  return arr;
+};
+
+var checkAvailableGames = function(){
+  console.log('Checking for availabe room');
+  var playersInGame = 0;
+  var room;
+  for(var i in rooms){
+    if(playersInGame < rooms[i].users_count && rooms[i].users_count < MAX_PLAYERS){
+      playersInGame = rooms[i].players;
+      room = rooms[i];
+    }
+  }
+
+  if(!room){
+    var guid = node_guid.new();
+    //Create a new room
+    room = rooms[guid] = {
+        guid:guid,
+        users:{},
+        users_count:0,
+        drawer_queue:[],
+        round:{timer:0,nb:0,clock:null,drawer:null,word:null},
+        colors:{}
+    }
+  }
+
+  return room;
+
+};
+
 
 io.sockets.on('connection',function(socket){
     var channel = null;
@@ -34,28 +97,23 @@ io.sockets.on('connection',function(socket){
     var player = null;
 
     socket.on('room_connect',function(data,cb){
-        if(data.token !== token){
-            //intruder
-            return;
-        }
-        console.log('['+data.player.name+' IS JOINING ROOM #'+data.room+']');
+        console.log('[ '+data.player.name+' IS JOINING A GAME ]');
 
-        player = data.player;
+        var data = 
+        if(!usersExpectedToJoin[data.player.guid] || room.users_count >= MAX_PLAYERS){
+          return;
+        }else if(usersExpectedToJoin[data.player.guid]){
+          player = data.player;
+        }
+        
         room_nb = data.room;
+        var room = rooms[room_nb];
+
+
         channel = 'room'+room_nb;
 
         socket.join(channel);
-        var room = rooms[room_nb];
-        
-        if(!room){
-            room = rooms[data.room] = {
-                guid:guid,
-                users:{},
-                users_count:0,
-                drawer_queue:[],
-                round:{timer:0,nb:0,clock:null,drawer:null,word:null}
-            }
-        }else if(rooms[data.room].users_count === 1){
+        if(room.users_count === 1){
           startRound(room);
         }
 
@@ -69,7 +127,7 @@ io.sockets.on('connection',function(socket){
         broadcast({type:'user_add',player:player});
 
         redis_db.getCurrentDrawing(room,function(err,strokes){
-            cb({users:room.users,round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, drawing:strokes}});
+          cb({users:room.users,round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, drawing:strokes}});
         });
     });
 
@@ -104,6 +162,8 @@ io.sockets.on('connection',function(socket){
 
         delete room.users[player.guid];
         room.users_count--;
+
+        delete room.colors[player.color.join()];
 
         //remove user from drawer queue (if still present)
         for(var i in room.drawer_queue){

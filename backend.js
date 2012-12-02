@@ -1,9 +1,9 @@
-function Backend(room){
+function Backend(){
   var self = this;
   this._socket = io.connect();
 
   this._socket.on('connect',function(){
-    self._socket.emit('room_connect',{room:room,player:UM.me.flatten()},function(data){self.room_connect(data)});
+    self._socket.emit('room_connect',{player:UM.me.flatten()},function(data){self.room_connect(data)});
     self._socket.on('on_room_update',function(data){self.processMessage(data)});
     self._socket.on('drawing',function(data){App.processStroke(data)});
   });
