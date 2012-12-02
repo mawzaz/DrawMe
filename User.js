@@ -71,6 +71,7 @@ UserDb.prototype =
 	                var newUser = new self.User(
 	                    {
 	                        email:email.toUpperCase(), 
+	                        username:email.toUpperCase(),
 	                        password:hash, 
 	                        nickname:nickname, 
 	                        played:0, 
@@ -84,7 +85,7 @@ UserDb.prototype =
 	                       {
 	                           if(err.code == 11000) 
 	                           { 	                         
-		                           console.log("Attempt to create existing user");
+		                           console.log("Attempt to create existing user failed, user already exists");
 		                           callback(null, false);
 		                       }
 		                       else
@@ -92,16 +93,15 @@ UserDb.prototype =
 		                          console.log(err.err);
 		                          callback(err);
 		                       }
-	                        }
+	                        } // No error
 	                        else
 	                        {
-	                           console.log("New user created");
-	                           callback(null, true);
+                            callback(null, newUser);
 	                        }
-	                    }); //newUser.save()
+	                    }); //end newUser.save()
 	            }
-	            }); //self.Hash()
-	    }//if
+	            }); //end self.Hash()
+	    }//endif
 	    else
 	    {
 	        console.log("Error: input mismatch");
