@@ -30,7 +30,7 @@ app.use(passport.session());
 //   the user by ID when deserializing.
 passport.serializeUser(function(user, done) {
     console.log("Serializing user: " + user);
-    done(null, JSON.stringify({_id : user._id, nickname: user.nickname}) );
+    done(null, JSON.stringify({_id:user._id, nickname:user.nickname}) );
 });
 
 passport.deserializeUser(function(user, done) {
@@ -39,8 +39,16 @@ passport.deserializeUser(function(user, done) {
 });
 
 app.get('/', function (req, res) {
-    console.log("GETTING HTML");
-    res.sendfile(__dirname + '/index.html');
+    if (req.user)
+    {
+      res.redirect('/menu');
+    }
+    else
+    {
+      console.log("GETTING HTML");
+      
+      res.sendfile(__dirname + '/index.html');
+    }
 });
 
 
@@ -127,6 +135,8 @@ app.post('/register', function(req,result){
       pass = req.body.password,
       pass_confirm = req.body.confirmPassword;
       
+  console.log("Nickname: " +nickname)
+      
   user.createUser(email, nickname, pass, pass_confirm, function(err, res)
   {
     if(err)
@@ -145,7 +155,7 @@ app.post('/register', function(req,result){
         }
         else
         {
-          result.redirect("/login");
+          result.redirect("/menu");
         }
       });
       
@@ -230,7 +240,16 @@ app.post('/changeNickname', function(req,res){
 });
 
 app.get('/menu',function(req,res){
-  res.sendfile(__dirname + '/menu.html');
+  if (req.user)
+  {
+    console.log("User: " +req.user +" loaded '/menu'")
+    res.sendfile(__dirname + '/menu.html');
+  }
+  else
+  {
+    //TODO: Tell user to login
+    res.redirect('/');
+  }
 })
 
 //===================Parsing the account form===================

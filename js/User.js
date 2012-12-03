@@ -17,6 +17,7 @@ function UserDb()
     this.userSchema = new mongoose.Schema(
         {
             email: {type: String, index: {unique:true}},
+            username: String,
             password: String,
             nickname: String,
             played: Number,   
@@ -70,7 +71,8 @@ UserDb.prototype =
 	            {
 	                var newUser = new self.User(
 	                    {
-	                        email:email.toUpperCase(), 
+	                        email:email.toUpperCase(),
+	                        username:email.toUpperCase(),
 	                        password:hash, 
 	                        nickname:nickname, 
 	                        played:0, 
@@ -96,7 +98,7 @@ UserDb.prototype =
 	                        else
 	                        {
 	                           console.log("New user created");
-	                           callback(null, true);
+	                           callback(null, newUser);
 	                        }
 	                    }); //newUser.save()
 	            }

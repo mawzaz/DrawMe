@@ -76,7 +76,7 @@ _.flush = function(room,cb){
 
       fs.writeFile('./drawings/'+drawing.guid+'.json',JSON.stringify(drawing,null,2),function(err){
         if(err){
-          console.err(err);
+          console.error(err);
         }else{
           console.log('BACKED UP DRAWING ',drawing.guid);
         }
