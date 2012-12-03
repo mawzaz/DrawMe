@@ -169,6 +169,10 @@ io.sockets.on('connection',function(socket){
         
         var room = rooms[room_nb];
 
+        if(!room){
+            return;
+        }
+
         delete room.users[player.guid];
         room.users_count--;
 

@@ -111,6 +111,14 @@
         window.initApp = function(cb){
           cb(data);
         }
+
+        window.destroyApp = function(cb){
+          $(iframeWrapper).hide();
+          iframe.src = "";
+          $(menuDiv).show();
+
+        }
+
         //redirect
         console.log("got json object : ", data);
 

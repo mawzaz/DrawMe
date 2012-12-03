@@ -29,6 +29,16 @@
   }
   if(top !== window){
     top.initApp(init);
+
+    var backButton = document.createElement('div');
+    backButton.id = "back-button";
+    backButton.className = "button";
+    $(backButton).html('<-');
+    $(backButton).click(function(){
+      top.destroyApp();
+    });
+
+    document.body.appendChild(backButton);
   }else{
     init();
   }
