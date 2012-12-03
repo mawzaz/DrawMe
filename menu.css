@@ -101,3 +101,70 @@ body{
   font-size: 32px;
   margin-top: 80px;
 }
+
+.blur{
+  color: rgba(255, 255, 255, 0.5) !important;
+  text-shadow: -1px -1px 0px rgba(0, 0, 0, 1);
+  /*text-align: right;*/
+}
+
+.focus{
+  box-shadow: inset 0 0 10px white;
+  color: white !important;
+}
+
+
+.password{
+  position: absolute;
+  color: inherit;
+  text-align: left;
+}
+.password-wrapper{
+  width: inherit;
+  height: inherit;
+  position: absolute;
+  z-index: 2;
+  border-radius: 4px;
+}
+
+.password-wrapper:hover{
+  cursor: text;
+}
+
+
+.input-box-wrapper{
+  width: 200px;
+  height: 40px;
+  overflow: hidden;
+  box-shadow: inset 0 0 1px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 24px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+  margin-left: 255;
+  margin-top: 55px;
+}
+
+input{
+  width: inherit;
+  height: inherit;
+  -webkit-user-select : text;
+  border: none;
+  -webkit-appearance: none;
+  font-size: 24px;
+  font-family: "Finger Paint";
+  background-color: transparent;
+  text-shadow:inherit;
+  text-align: inherit;
+  outline: none;
+  white-space: nowrap; 
+  color: inherit;
+  border-radius: 4px;
+}
+
+input:focus{
+  color: white;
+}

@@ -77,20 +77,7 @@
 
 	function validateRegistrationForm(){
 		//validate firstName
-		var a = document.forms['registrationForm']['firstName'].value;
 		var alphaExp = /^[a-zA-Z]+$/;
-
-		if(a==null || a==''){
-			alert('FirstName must be filled out');
-			document.forms['registrationForm']['firstName'].focus();
-			return false;
-		}
-
-		if(!a.match(alphaExp)){
-			alert('Cannot have numbers...');
-			document.forms['registrationForm']['firstName'].focus();
-			return false;
-		}	
 
 		//validate nickname
 		var b = document.forms['registrationForm']['nickName'].value;

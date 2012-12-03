@@ -80,13 +80,9 @@
       type: 'POST',
       url: '/myaccount',
       success: function(data){
-        //something happens
-        if(account)
-          account.destroy();
-        if(stats)
-          stats.destroy();
-
-        account = new Account(data);
+        var settings = new Account(data,menuBar);
+        $(menuBar).children().hide();
+        $(menuBar).append(settings.maindiv);
 
       },
     });
