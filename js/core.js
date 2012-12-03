@@ -24,7 +24,7 @@ Core.prototype = {
     }
   },
 
-  getCanvasPosition : function(){
+  getCanvasPos: function(){
     this.canvasPos = $('#canvas').position();
     this.canvasPos.w = $('#canvas').width();
     this.canvasPos.h = $('#canvas').height();

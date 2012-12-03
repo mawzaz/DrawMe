@@ -2,20 +2,17 @@ var io = require('socket.io'),
     express = require('express'),
     app = express(),
     server = require('http').createServer(app),
-    redis_db = require('./js/redis-db.js'),
+    redis_db = require('./redis-db.js'),
     redis_pubsub = require('redis'),
     node_guid = require('node-guid');
 
-app.use('/js',express.static(__dirname + '/js'));
-app.use('/css',express.static(__dirname + '/css'));
-app.use('/images', express.static(__dirname + '/images'));
-app.use('/lib', express.static(__dirname + '/lib'));
-
+app.use('/',express.static(__dirname + '/'));
+app.use('/images', express.static(__dirname + '/'));
 
 io = io.listen(server,{ log: false });
 server.listen(8001);
 
-app.get('/', function (req, res) {
+app.get('/app', function (req, res) {
     console.log("GETTING HTML");
     res.sendfile(__dirname + '/app.html');
 });
@@ -106,20 +103,18 @@ io.sockets.on('connection',function(socket){
 
     socket.on('room_connect',function(data,cb){
         console.log('[ '+data.player.name+' IS JOINING A GAME ]');
-        if(!data.player){
-            return;
-        }
 
-        var info = usersExpectedToJoin[data.player.guid];
-        if(!info || info.room.users_count >= MAX_PLAYERS){
+        if(!usersExpectedToJoin[data.player.guid] || room.users_count >= MAX_PLAYERS){
           return;
-        }else{
-          player = info.player;
-          room =  info.room;
-          room_nb = room.guid;
-          channel = 'room'+room_nb;
+        }else if(usersExpectedToJoin[data.player.guid]){
+          player = data.player;
         }
+        
+        room_nb = data.room;
+        var room = rooms[room_nb];
 
+
+        channel = 'room'+room_nb;
 
         socket.join(channel);
         if(room.users_count === 1){

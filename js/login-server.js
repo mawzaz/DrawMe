@@ -7,16 +7,15 @@ var io = require('socket.io'),
     passport = require("passport"),
     LocalStrategy = require("passport-local").Strategy,
     util = require("util"),
-    user = require("./js/User.js");
+    user = require("./User.js");
 
 
 
 io = io.listen(server,{ log: false });
 server.listen(8000);
 
-app.use('/js',express.static(__dirname + '/js'));
-app.use('/css',express.static(__dirname + '/css'));
-app.use('/images', express.static(__dirname + '/images'));
+app.use(express.static(__dirname + '/'));
+app.use('/images', express.static(__dirname + '/'));
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.use(express.session({secret : "ECSE FTW"})),
@@ -37,12 +36,6 @@ passport.deserializeUser(function(user, done) {
     console.log("User deserialized, id: "+user);
     done(null, JSON.parse(user));
 });
-
-app.get('/', function (req, res) {
-    console.log("GETTING HTML");
-    res.sendfile(__dirname + '/index.html');
-});
-
 
 
 
@@ -90,7 +83,7 @@ client.on('message',function(channel,msg){
     }
 });
 
-app.post('/login', passport.authenticate('local', {successRedirect:'/menu', failureRedirect:'/'}));
+app.post('/login', passport.authenticate('local', {successRedirect:'/menu.html', failureRedirect:'/index.html'}));
 
 app.post("/test", function(res, req)
 {
@@ -122,7 +115,7 @@ app.post('/random_game', function(req, res)
 //=================Register=====================
 app.post('/register', function(req,result){
   
-  var email = req.body.email,
+  var email = req.body.username,
       nickname = req.body.nickname,
       pass = req.body.password,
       pass_confirm = req.body.confirmPassword;
@@ -145,7 +138,7 @@ app.post('/register', function(req,result){
         }
         else
         {
-          result.redirect("/login");
+          result.redirect("/menu.html");
         }
       });
       
@@ -245,7 +238,7 @@ app.post('/changeAccount', function(req,res){
 
     user.changeAccount(req.user._id, nick, oldpass, newpass, confpass, function(err,data){
         if(data){
-            res.redirect('/menu');
+            res.redirect('/menu.html');
         }else{
             console.log('something went wrong');
         }

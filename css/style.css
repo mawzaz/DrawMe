@@ -54,7 +54,7 @@
 }
 
 body{
-  background-image: url(./images/background_paper_tile.jpeg);
+  background-image: url(../images/background_paper_tile.jpeg);
   font-family: "Finger Paint";
   padding: 5px;
   color: rgba(255, 255, 255, 0.8);
@@ -235,7 +235,7 @@ body{
 }
 
 .current-drawer{
-  background-image: url(./images/glyphicons-halflings-white.png);
+  background-image: url(../images/glyphicons-halflings-white.png);
   background-position: 0 -72px;
   display: inline-block;
   height: 15px;

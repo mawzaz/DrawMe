@@ -1,5 +1,6 @@
 function Player(params){  
   params = params || {};
+  this.params = params;
   params.color = params.color || this._generateRandomColor();
   this.name = params.name || this._generateName();
 
@@ -57,6 +58,6 @@ Player.prototype = {
   },
 
   flatten : function(){
-    return {name:this.name.replace('*',''), color:this.color, guid:this.guid};
+    return {name:this.name.replace('*',''), color:this.params.color, guid:this.guid};
   }
 }
