@@ -166,6 +166,10 @@ io.sockets.on('connection',function(socket){
     });
 
     var leaveRoom = function(){
+        if (!player)
+        {  
+          return;
+        }
         console.log('['+player.name+' IS LEAVING ROOM #'+room_nb+']');
 
         broadcast({type:'user_remove',player:player.guid});
