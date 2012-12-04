@@ -13,8 +13,9 @@ app.use('/images', express.static(__dirname + '/images'));
 app.use('/lib', express.static(__dirname + '/lib'));
 
 
-io = io.listen(server,{ log: false });
+io = io.listen(server,{ log: false, reconnect:false });
 server.listen(8001);
+
 
 app.get('/', function (req, res) {
     console.log("GETTING HTML");
