@@ -186,7 +186,16 @@ UserDb.prototype =
     	 		callback(null,user);
     	 	}
     	 });
-		
+    },
+    incrementPoints : function(id, numPoints, callback)
+    {
+      this.User.update({_id:id}, {$inc : {points : numPoints}}, function(err){});
+    },
+
+    incrementPlayed : function(id, callback)
+    {
+      this.User.update({_id:id}, {$inc : {played : 1}}, function(err){});
+    },
 		// this.User.update({nickname: nick}, {$set: { nickname:nick}}, function(err,res){
 		// 	if(err){
 		// 		console.log('could not update');
@@ -197,7 +206,7 @@ UserDb.prototype =
 		// 		callback(null,true);
 		// 	}
 		// });
-    },
+    // },
 
 }
 module.exports = new UserDb();

@@ -229,6 +229,7 @@ app.post('/changeNickname', function(req,res){
     user.changeNickname(req.user._id, nick, function(err,data){
         if(data){
             res.redirect('/menu');
+            req.user.nickname = nick
         }else{
             console.log('something went wrong');
         }
