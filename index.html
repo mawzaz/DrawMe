@@ -66,150 +66,151 @@
   var lastNames = new Array("Snicker", "Buffalo", "Gross", "Bubble", "Sheep", "Corset", "Toilet", "Lizard", "Waffle", "Kumquat", "Burger", "Chimp", "Liver", "Gorilla", "Rhino", "Emu", "Pizza", "Toad", "Gerbil", "Pickle", "Tofu", "Chicken", "Potato", "Hamster", "Lemur", "Vermin");
   var lastNames2 = new Array("face", "dip", "nose", "brain", "head", "breath", "pants", "shorts", "lips", "mouth", "muffin", "butt", "bottom", "elbow", "honker", "toes", "buns", "spew", "kisser", "fanny", "squirt", "chunks", "brains", "wit", "juice", "shower");
 
+  $(document).ready(function(){
+	  function randomNickname(){
+	    return firstNames[Math.floor(Math.random()*firstNames.length)]+' '+lastNames[Math.floor(Math.random()*lastNames.length)];+lastNames2[Math.floor(Math.random()*lastNames2.length)];
+	  };
 
-  function randomNickname(){
-    return firstNames[Math.floor(Math.random()*firstNames.length)]+' '+lastNames[Math.floor(Math.random()*lastNames.length)];+lastNames2[Math.floor(Math.random()*lastNames2.length)];
-  };
+		$(document).ready(function(){
+			// $("#nickname").val(randomNickname());
+		});
 
-	$(document).ready(function(){
-		// $("#nickname").val(randomNickname());
-	});
+		function validateRegistrationForm(){
+			//validate firstName
+			var alphaExp = /^[a-zA-Z]+$/;
 
-	function validateRegistrationForm(){
-		//validate firstName
-		var alphaExp = /^[a-zA-Z]+$/;
+			//validate nickname
+			var b = document.forms['registrationForm']['nickName'].value;
+			if(b==null || b==''){
+				alert('You must have a nickname');
+				document.forms['registrationForm']['nickName'].focus();
+				return false;
+			}
 
-		//validate nickname
-		var b = document.forms['registrationForm']['nickName'].value;
-		if(b==null || b==''){
-			alert('You must have a nickname');
-			document.forms['registrationForm']['nickName'].focus();
-			return false;
+			//validate email
+			var c = document.forms['registrationForm']['email'].value;
+			var atpos=c.indexOf("@");
+			var dotpos=c.lastIndexOf(".");
+
+			if (atpos<1 || dotpos<atpos+2 || dotpos+2>=c.length){
+				alert("Not a valid e-mail address");
+				document.forms['registrationForm']['email'].focus();
+				return false;
+			}
+
+			//validate passwords
+			var d = document.forms['registrationForm']['password'].value;
+			
+			var e = document.forms['registrationForm']['confirmPassword'].value;
+			
+			if(d==null || d=='' || e==null || e==''){
+				alert('Please enter a password and confirm');
+				document.forms['registrationForm']['password'].focus();
+				return false;
+			}
+
+			if(d!=e){
+				alert('Passwords do not match');
+				document.forms['registrationForm']['password'].focus();
+				return false;
+			}
 		}
 
-		//validate email
-		var c = document.forms['registrationForm']['email'].value;
-		var atpos=c.indexOf("@");
-		var dotpos=c.lastIndexOf(".");
+		function showlayer(layer){
+			var myLayer = document.getElementById(layer);
 
-		if (atpos<1 || dotpos<atpos+2 || dotpos+2>=c.length){
-			alert("Not a valid e-mail address");
-			document.forms['registrationForm']['email'].focus();
-			return false;
+			if(myLayer.style.display=="none" || myLayer.style.display==""){
+				myLayer.style.display="block";
+			} else { 
+				myLayer.style.display="none";
+			}
 		}
 
-		//validate passwords
-		var d = document.forms['registrationForm']['password'].value;
-		
-		var e = document.forms['registrationForm']['confirmPassword'].value;
-		
-		if(d==null || d=='' || e==null || e==''){
-			alert('Please enter a password and confirm');
-			document.forms['registrationForm']['password'].focus();
-			return false;
-		}
+		var regPassword = document.getElementById("password-reg");
 
-		if(d!=e){
-			alert('Passwords do not match');
-			document.forms['registrationForm']['password'].focus();
-			return false;
-		}
-	}
+		var d = document.getElementById("reg-password-label");
+		$(d).html("Password");
+		$(d).click(function(){onBlurFocusDiv(d,regPassword,'Password');});
 
-	function showlayer(layer){
-		var myLayer = document.getElementById(layer);
-
-		if(myLayer.style.display=="none" || myLayer.style.display==""){
-			myLayer.style.display="block";
-		} else { 
-			myLayer.style.display="none";
-		}
-	}
-
-	var regPassword = document.getElementById("password-reg");
-
-	var d = document.getElementById("reg-password-label");
-	$(d).html("Password");
-	$(d).click(function(){onBlurFocusDiv(d,regPassword,'Password');});
-
-	$(regPassword).blur(function(){
-		onBlurFocusDiv(d,regPassword,'Password',true);
-	});
+		$(regPassword).blur(function(){
+			onBlurFocusDiv(d,regPassword,'Password',true);
+		});
 
 
-	var confirmPassword = document.getElementById("confirm-password");
+		var confirmPassword = document.getElementById("confirm-password");
 
-	var e = document.getElementById("confirm-password-label");
-	$(e).html("Confirm");
-	$(e).click(function(){onBlurFocusDiv(e,confirmPassword,'Confirm');});
+		var e = document.getElementById("confirm-password-label");
+		$(e).html("Confirm");
+		$(e).click(function(){onBlurFocusDiv(e,confirmPassword,'Confirm');});
 
-	$(confirmPassword).blur(function(){
-		onBlurFocusDiv(e,confirmPassword,'Confirm',true);
-	});
+		$(confirmPassword).blur(function(){
+			onBlurFocusDiv(e,confirmPassword,'Confirm',true);
+		});
 
-	var c = document.getElementById("email");
-	c.value = "Email";
-	$(c).blur(function(){onBlur(c,'Email');});
-	$(c).focus(function(){onFocus(c,'Email');});
+		var c = document.getElementById("email");
+		c.value = "Email";
+		$(c).blur(function(){onBlur(c,'Email');});
+		$(c).focus(function(){onFocus(c,'Email');});
 
-	var b = document.getElementById("nickname");
-	b.value = "Nickname";
-	$(b).blur(function(){onBlur(b,'Nickname');});
-	$(b).focus(function(){onFocus(b,'Nickname');});
+		var b = document.getElementById("nickname");
+		b.value = "Nickname";
+		$(b).blur(function(){onBlur(b,'Nickname');});
+		$(b).focus(function(){onFocus(b,'Nickname');});
 
-	var a = document.getElementById("username");
-	a.value = "Email";
-	$(a).blur(function(){onBlur(a,'Email');});
-	$(a).focus(function(){onFocus(a,'Email');});
+		var a = document.getElementById("username");
+		a.value = "Email";
+		$(a).blur(function(){onBlur(a,'Email');});
+		$(a).focus(function(){onFocus(a,'Email');});
 
-	var loginPassword = document.getElementById("password");
+		var loginPassword = document.getElementById("password");
 
-	var f = document.getElementById("login-password-label");
-	$(f).html("Password");
-	$(f).click(function(){onBlurFocusDiv(f,loginPassword,'Password');});
+		var f = document.getElementById("login-password-label");
+		$(f).html("Password");
+		$(f).click(function(){onBlurFocusDiv(f,loginPassword,'Password');});
 
-	$(loginPassword).blur(function(){
-		onBlurFocusDiv(f,loginPassword,'Password',true);
-	});
+		$(loginPassword).blur(function(){
+			onBlurFocusDiv(f,loginPassword,'Password',true);
+		});
 
 
 
-	var onBlur = function(ctn,defaultText){
-		if(ctn.value === ""){
-			ctn.value = defaultText;
-			$(ctn).css('text-align','right');
-		}
-		$(ctn).addClass('blur');
-		$(ctn).removeClass('focus');
-	}
-
-	var onBlurFocusDiv  = function(ctn,wrappedDiv, defaultText, wrappedDivCaller){
-		if($(ctn).html() === "" && wrappedDiv.value === ""){
-			$(ctn).css('text-align','right');
-			$(ctn).html(defaultText);
+		var onBlur = function(ctn,defaultText){
+			if(ctn.value === ""){
+				ctn.value = defaultText;
+				$(ctn).css('text-align','right');
+			}
 			$(ctn).addClass('blur');
 			$(ctn).removeClass('focus');
-		} else if($(ctn).html() === defaultText && wrappedDiv.value === ""){
-			$(ctn).html("");
+		}
+
+		var onBlurFocusDiv  = function(ctn,wrappedDiv, defaultText, wrappedDivCaller){
+			if($(ctn).html() === "" && wrappedDiv.value === ""){
+				$(ctn).css('text-align','right');
+				$(ctn).html(defaultText);
+				$(ctn).addClass('blur');
+				$(ctn).removeClass('focus');
+			} else if($(ctn).html() === defaultText && wrappedDiv.value === ""){
+				$(ctn).html("");
+				$(ctn).removeClass('blur');
+				$(ctn).addClass('focus');
+				$(wrappedDiv).focus();
+			} else if(wrappedDiv.value !== "" && !wrappedDivCaller){
+				$(wrappedDiv).focus();
+				$(ctn).addClass('focus');
+			} else if(wrappedDivCaller){
+				$(ctn).removeClass('focus');
+				$(ctn).html("");
+			}
+		}
+
+		var onFocus = function(ctn,defaultText, text){
+			if(ctn.value === defaultText){
+				ctn.value = "";
+				$(ctn).css('text-align','left');
+			}	
 			$(ctn).removeClass('blur');
 			$(ctn).addClass('focus');
-			$(wrappedDiv).focus();
-		} else if(wrappedDiv.value !== "" && !wrappedDivCaller){
-			$(wrappedDiv).focus();
-			$(ctn).addClass('focus');
-		} else if(wrappedDivCaller){
-			$(ctn).removeClass('focus');
-			$(ctn).html("");
 		}
-	}
-
-	var onFocus = function(ctn,defaultText, text){
-		if(ctn.value === defaultText){
-			ctn.value = "";
-			$(ctn).css('text-align','left');
-		}	
-		$(ctn).removeClass('blur');
-		$(ctn).addClass('focus');
-	}
+	});
 </script>
 </html>

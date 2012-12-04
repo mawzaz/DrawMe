@@ -16,155 +16,158 @@
 <div id="menu" ></div>
 
 <script type="text/javascript">
-  var menuDiv = document.getElementById('menu');
-  menuDiv.className = "fit";
-  document.body.appendChild(menuDiv);
   
+  $(document).ready(function(){
+    var menuDiv = document.getElementById('menu');
+    menuDiv.className = "fit";
+    document.body.appendChild(menuDiv);
+    
 
-  var iframeWrapper = document.createElement("div");
-  iframeWrapper.id = "iframe-wrapper";
-  iframeWrapper.className = "fit";
-  document.body.appendChild(iframeWrapper);
-  $(iframeWrapper).hide();
+    var iframeWrapper = document.createElement("div");
+    iframeWrapper.id = "iframe-wrapper";
+    iframeWrapper.className = "fit";
+    document.body.appendChild(iframeWrapper);
+    $(iframeWrapper).hide();
 
 
-  var iframe = document.createElement("iframe");
-  iframeWrapper.appendChild(iframe);
+    var iframe = document.createElement("iframe");
+    iframeWrapper.appendChild(iframe);
 
-  var menuBar = document.createElement('div');
-  menuBar.id = "main-ctn";
+    var menuBar = document.createElement('div');
+    menuBar.id = "main-ctn";
 
-  menuBar.show = function(){$(menuBar).children().show()};
+    menuBar.show = function(){$(menuBar).children().show()};
 
-  //Stats button
-  //==============================================
-  var statsButton = document.createElement('div');
-  statsButton.className= "button";
-  $(statsButton).html('My Stats');
-  $(statsButton).hover(function(){
-    $(this).addClass('stats');
-  },function(){
-    $(this).removeClass('stats');
-  });
-  
-
-  var optionsDiv;
-  statsButton.onclick = function(){
-    $.ajax({
-      type: 'POST',
-      url: '/mystats',
-      success: function(data){
-        var stats = new Stats(data,menuBar);
-        $(menuBar).children().hide();
-        $(menuBar).append(stats.maindiv);
-
-      },
+    //Stats button
+    //==============================================
+    var statsButton = document.createElement('div');
+    statsButton.className= "button";
+    $(statsButton).html('My Stats');
+    $(statsButton).hover(function(){
+      $(this).addClass('stats');
+    },function(){
+      $(this).removeClass('stats');
     });
-  };
-  menuBar.appendChild(statsButton);
-  //==============================================
-  //Accounts button
-  //==============================================
-  var accountButton = document.createElement('div');
-  accountButton.className= "button";
-  $(accountButton).html('Settings');
-  $(accountButton).hover(function(){
-    $(this).addClass('account');
-  },function(){
-    $(this).removeClass('account');
-  });
+    
 
-  var account;
-  accountButton.onclick = function(){
-    $.ajax({
-      type: 'POST',
-      url: '/myaccount',
-      success: function(data){
-        var settings = new Account(data,menuBar);
-        $(menuBar).children().hide();
-        $(menuBar).append(settings.maindiv);
+    var optionsDiv;
+    statsButton.onclick = function(){
+      $.ajax({
+        type: 'POST',
+        url: '/mystats',
+        success: function(data){
+          var stats = new Stats(data,menuBar);
+          $(menuBar).children().hide();
+          $(menuBar).append(stats.maindiv);
 
-      },
+        },
+      });
+    };
+    menuBar.appendChild(statsButton);
+    //==============================================
+    //Accounts button
+    //==============================================
+    var accountButton = document.createElement('div');
+    accountButton.className= "button";
+    $(accountButton).html('Settings');
+    $(accountButton).hover(function(){
+      $(this).addClass('account');
+    },function(){
+      $(this).removeClass('account');
     });
-  };
-  menuBar.appendChild(accountButton);
-  //==============================================
 
-  //Random Game
-  //==============================================
-  
-  var randomButton = document.createElement('div');
-  randomButton.className= "button";
-  $(randomButton).html('Play Now! :)');
-  $(randomButton).hover(function(){
-    $(this).addClass('random');
-  },function(){
-    $(this).removeClass('random');
-  });
+    var account;
+    accountButton.onclick = function(){
+      $.ajax({
+        type: 'POST',
+        url: '/myaccount',
+        success: function(data){
+          var settings = new Account(data,menuBar);
+          $(menuBar).children().hide();
+          $(menuBar).append(settings.maindiv);
 
+        },
+      });
+    };
+    menuBar.appendChild(accountButton);
+    //==============================================
 
-  $(randomButton).click(function(){
-    $.ajax({
-      type: 'POST',
-      url: '/random_game',
-      success: function(data){
-        window.initApp = function(cb){
-          cb(data);
-        }
-
-        window.destroyApp = function(cb){
-          $(iframeWrapper).hide();
-          iframe.src = "";
-          $(menuDiv).show();
-
-        }
-
-        //redirect
-        console.log("got json object : ", data);
-
-        iframe.height = window.innerHeight;
-        iframe.width = window.innerWidth;
-
-        iframe.src = 'http://'+ location.hostname +'/app/';
-
-        $(menuDiv).hide();
-
-        $(iframeWrapper).show();        
-
-      },
+    //Random Game
+    //==============================================
+    
+    var randomButton = document.createElement('div');
+    randomButton.className= "button";
+    $(randomButton).html('Play Now! :)');
+    $(randomButton).hover(function(){
+      $(this).addClass('random');
+    },function(){
+      $(this).removeClass('random');
     });
+
+
+    $(randomButton).click(function(){
+      $.ajax({
+        type: 'POST',
+        url: '/random_game',
+        success: function(data){
+          window.initApp = function(cb){
+            cb(data);
+          }
+
+          window.destroyApp = function(cb){
+            $(iframeWrapper).hide();
+            iframe.src = "";
+            $(menuDiv).show();
+
+          }
+
+          //redirect
+          console.log("got json object : ", data);
+
+          iframe.height = window.innerHeight;
+          iframe.width = window.innerWidth;
+
+          iframe.src = 'http://'+ location.hostname +'/app/';
+
+          $(menuDiv).hide();
+
+          $(iframeWrapper).show();        
+
+        },
+      });
+    });
+    $(menuBar).prepend(randomButton);
+    //==============================================
+
+    //Logut button
+    var logoutForm = document.createElement('form');
+    logoutForm.method ='GET';
+    logoutForm.action ='/logout';
+
+    var logoutButton = document.createElement('div');
+    $(logoutButton).html('Logout');
+    logoutButton.className= "button";
+    $(logoutButton).hover(function(){
+      $(this).addClass('logout');
+      $(this).html(':(');
+    },function(){
+      $(this).removeClass('logout');
+      $(this).html('Logout');
+    });
+
+    logoutButton.onclick = function(){
+      logoutForm.submit();
+    }
+    
+    logoutForm.appendChild(logoutButton);
+
+
+    menuBar.appendChild(logoutForm);
+     //==============================================
+
+    menuDiv.appendChild(menuBar);
+    // document.body.appendChild(responseDiv);
   });
-  $(menuBar).prepend(randomButton);
-  //==============================================
-
-  //Logut button
-  var logoutForm = document.createElement('form');
-  logoutForm.method ='GET';
-  logoutForm.action ='/logout';
-
-  var logoutButton = document.createElement('div');
-  $(logoutButton).html('Logout');
-  logoutButton.className= "button";
-  $(logoutButton).hover(function(){
-    $(this).addClass('logout');
-    $(this).html(':(');
-  },function(){
-    $(this).removeClass('logout');
-    $(this).html('Logout');
-  });
-
-  logoutButton.onclick = function(){
-    logoutForm.submit();
-  }
-  
-  logoutForm.appendChild(logoutButton);
-
-
-  menuBar.appendChild(logoutForm);
-   //==============================================
-
-  menuDiv.appendChild(menuBar);
-  // document.body.appendChild(responseDiv);
 
 </script>
 </body>
