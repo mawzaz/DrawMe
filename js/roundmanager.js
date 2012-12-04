@@ -257,10 +257,10 @@ RoundManager.prototype = {
       return sizepreview;
     };
 
-    var small = createSizePreview(1);
-    var medium = createSizePreview(4);
-    var large = createSizePreview(8);
-    var xlarge = createSizePreview(12);
+    var small = createSizePreview(4);
+    var medium = createSizePreview(8);
+    var large = createSizePreview(12);
+    var xlarge = createSizePreview(16);
 
     small.select();medium.unselect();large.unselect();xlarge.unselect();
 
