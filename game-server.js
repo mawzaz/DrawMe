@@ -4,6 +4,7 @@ var io = require('socket.io'),
     server = require('http').createServer(app),
     redis_db = require('./js/redis-db.js'),
     redis_pubsub = require('redis'),
+    mongo_db = require('./js/User.js'),
     node_guid = require('node-guid');
 
 app.use('/js',express.static(__dirname + '/js'));
@@ -227,7 +228,12 @@ io.sockets.on('connection',function(socket){
             room.round.word = WORDS[Math.floor(Math.random()*WORDS.length)];
 
             broadcast({type:'round_start',round:{nb:room.round.nb, time:room.round.timer, drawer:room.round.drawer ? room.round.drawer.guid : null, word:room.round.word}});
-
+            
+            //increment games played for all players in the room
+            for (var player in room.users){
+              mongo_db.incrementPlayed(player, function(){});
+            }
+            
             room.round.clock = setInterval(function(){
                 if(room.round.timer < 0){
                     clearInterval(room.round.clock);
@@ -283,8 +289,9 @@ io.sockets.on('connection',function(socket){
 
         if(msg.chat.value.toLowerCase() === room.round.word){
             redis_db.flush(room);
-
+            
             broadcast({type:'results', winner:msg.chat.user, word:room.round.word});
+            mongo_db.incrementPoints(msg.chat.user, 1, function(){});
             stopRound(room);
         }
     }
