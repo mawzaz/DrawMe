@@ -330,6 +330,7 @@ app.prototype =
 
 		Page.clear();
 		Page.disable();
+		$(this._replybox).blur();
 
 		if(this._preroundtimer && (!UM.get(round.drawer) || this._preroundtimer.time > 1)){
 			$(this._preroundtimer).html('ABORTED round '+(round.nb ? round.nb : 1));
@@ -616,5 +617,7 @@ app.prototype =
 		});
 
 		this.hideChat("Waiting for next round...");
+
+
 	}
 }

@@ -25,7 +25,7 @@ page.prototype =
 		Backend.sendStroke({type:"begin",point:[ev.layerX,ev.layerY],color:this.color, width:this.width});
 		
 		this.canvas.onmousemove = function(ev){self.onMouseMove(ev);}
-		this.canvas.onmouseup = function(ev){self.onMouseUp(ev);}
+		document.body.onmouseup = function(ev){self.onMouseUp(ev);}
 		
 	},
 	
@@ -41,7 +41,7 @@ page.prototype =
 	onMouseUp:function(ev)
 	{
 		this.canvas.onmousemove = null;
-		this.canvas.onmouseup = null;
+		document.body.onmouseup = null;
 
 		App.addStroke({points:this.positions, color:this.color, width:this.width});
 		Backend.sendStroke({type:"end",points:this.positions,color:this.color, width:this.width});
@@ -73,7 +73,7 @@ page.prototype =
 		this.clear();
 		this.canvas.onmousedown = null;
 		this.canvas.onmousemove = null;
-		this.canvas.onmouseup = null;
+		document.body.onmouseup = null;
 	},
 
 	enable:function(){

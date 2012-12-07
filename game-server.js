@@ -213,6 +213,10 @@ io.sockets.on('connection',function(socket){
     }
 
     var startRound = function(room){
+        if(!room){
+            return;
+        }
+        
         room.round.drawer = room.drawer_queue.shift();
 
         var round = {drawer:room.round.drawer ? room.round.drawer.guid : null, nb:++room.round.nb};
@@ -266,6 +270,10 @@ io.sockets.on('connection',function(socket){
     }
 
     var stopRound = function(room){
+        if(!room){
+            return;
+        }
+
         room.round.timer = 0;
 
         //reset clock
@@ -290,6 +298,10 @@ io.sockets.on('connection',function(socket){
 
     var processGuess = function(msg){
         var room = rooms[room_nb];
+        if(!room){
+            return;
+        }
+
         broadcast(msg);
 
         if(msg.chat.value.toLowerCase() === room.round.word){

@@ -11,6 +11,10 @@ iframe {
   right: 0;
 }
 
+#iframe-wrapper{
+  overflow: hidden;
+}
+
 body{
   background-image: url(../images/background_paper_tile.jpeg);
   font-family: "Finger Paint";
